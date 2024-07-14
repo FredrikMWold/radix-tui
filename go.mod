@@ -1,4 +1,4 @@
-module text.go
+module radix.go
 
 go 1.22.5
 
