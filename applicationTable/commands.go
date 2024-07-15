@@ -46,5 +46,8 @@ func getApplications() tea.Msg {
 	}
 	trimmed := strings.TrimSpace(string(output))
 	application_list := strings.Split(trimmed, "\n")
+	if strings.Contains(application_list[0], "login.microsoft") {
+		application_list = getApplications().(Applications)
+	}
 	return Applications(application_list)
 }
