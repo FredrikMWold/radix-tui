@@ -1,0 +1,15 @@
+name: 🚀 Create release
+
+on:
+    push:
+        branches:
+            - master
+
+jobs:
+    release-please:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: google-github-actions/release-please-action@v3
+              with:
+                  release-type: go
+                  default-branch: master
