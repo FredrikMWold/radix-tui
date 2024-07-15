@@ -1,10 +1,10 @@
 package environmentTable
 
 import (
+	appTable "github.com/FredrikMWold/radix-tui/applicationTable"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/lipgloss"
-	appTable "radix.go/applicationTable"
 )
 
 type Model struct {

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	appTable "github.com/FredrikMWold/radix-tui/applicationTable"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	appTable "radix.go/applicationTable"
 )
 
 func (m Model) Init() tea.Cmd {

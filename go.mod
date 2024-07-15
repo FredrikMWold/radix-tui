@@ -1,4 +1,4 @@
-module radix.go
+module github.com/FredrikMWold/radix-tui
 
 go 1.22.5
 

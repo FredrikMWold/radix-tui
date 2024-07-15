@@ -1,9 +1,9 @@
 package main
 
 import (
-	appTable "radix.go/applicationTable"
-	envTable "radix.go/environmentTable"
-	pipeTable "radix.go/pipelineTable"
+	appTable "github.com/FredrikMWold/radix-tui/applicationTable"
+	envTable "github.com/FredrikMWold/radix-tui/environmentTable"
+	pipeTable "github.com/FredrikMWold/radix-tui/pipelineTable"
 )
 
 type Model struct {

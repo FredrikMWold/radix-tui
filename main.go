@@ -22,6 +22,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	}
+
 	var applicationsTableCmd tea.Cmd
 	m.applicationsTable, applicationsTableCmd = m.applicationsTable.Update(msg)
 	cmds = append(cmds, applicationsTableCmd)
