@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/FredrikMWold/radix-tui/compare/v1.1.1...v1.2.0) (2024-07-16)
+
+
+### Features
+
+* adds enter and escape as naviagtion options between pipelines and aplications ([fd9c2d0](https://github.com/FredrikMWold/radix-tui/commit/fd9c2d0e1382b3a3632c50e17d7ac0f1429ed4dc))
+
+
+### Bug Fixes
+
+* bug that would spam radix api more when swapping between application ([fd9c2d0](https://github.com/FredrikMWold/radix-tui/commit/fd9c2d0e1382b3a3632c50e17d7ac0f1429ed4dc))
+
 ## [1.1.1](https://github.com/FredrikMWold/radix-tui/compare/v1.1.0...v1.1.1) (2024-07-16)
 
 
