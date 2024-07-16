@@ -10,7 +10,7 @@ import (
 )
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(tick(), m.spinner.Tick, getApplications)
+	return tea.Batch(m.spinner.Tick, getApplications)
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -24,6 +24,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				return m, tea.Batch(
 					getApplicationData(m.selectedApp),
 					selectApplication(m.selectedApp),
+					tick(),
 				)
 			}
 		}
