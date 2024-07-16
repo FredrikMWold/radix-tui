@@ -10,7 +10,7 @@ import (
 )
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.spinner.Tick, getApplications)
+	return tea.Batch(tick(), m.spinner.Tick, getApplications)
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -21,11 +21,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case "enter", "ctrl+r":
 			if len(m.table.SelectedRow()) > 0 {
 				m.selectedApp = m.table.SelectedRow()[0]
-				return m, tea.Batch(
-					getApplicationData(m.selectedApp),
-					selectApplication(m.selectedApp),
-					tick(),
-				)
+				if m.selectedApp == "" {
+					cmds = append(cmds, tick())
+				}
+				cmds = append(cmds, getApplicationData(m.selectedApp), selectApplication(m.selectedApp))
+				return m, tea.Batch(cmds...)
 			}
 		}
 	case tea.WindowSizeMsg:
@@ -74,13 +74,5 @@ func (m Model) View() string {
 	} else {
 		section = lipgloss.JoinVertical(lipgloss.Center, "Applications", table)
 	}
-	return styles.SectionContainer(m.focused).Render(section)
-}
-
-func (m *Model) Focus() {
-	m.focused = true
-}
-
-func (m *Model) Blur() {
-	m.focused = false
+	return section
 }

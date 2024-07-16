@@ -73,15 +73,7 @@ func (m Model) View() string {
 		section = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication, table)
 	}
 
-	return styles.SectionContainer(m.focused).Render(section)
-}
-
-func (m *Model) Focus() {
-	m.focused = true
-}
-
-func (m *Model) Blur() {
-	m.focused = false
+	return section
 }
 
 func (m *Model) loadApplication(application applicationTable.Application) {
@@ -105,6 +97,9 @@ func (m *Model) loadApplication(application applicationTable.Application) {
 }
 
 func (m Model) openJobInBrowser() {
+	if len(m.jobs) == 0 {
+		return
+	}
 	tableCursor := m.table.Cursor()
 	url := fmt.Sprintf("https://console.radix.equinor.com/applications/%s/jobs/view/%s", m.selectedApplication, m.jobs[tableCursor])
 	exec.Command("open", url).Start()

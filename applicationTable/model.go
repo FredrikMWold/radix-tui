@@ -24,7 +24,6 @@ func New() Model {
 		),
 		spinner:               spiner,
 		isLoadingApplications: true,
-		focused:               true,
 	}
 }
 
@@ -33,7 +32,6 @@ type Model struct {
 	spinner               spinner.Model
 	isLoadingApplications bool
 	selectedApp           string
-	focused               bool
 }
 
 type Application struct {

@@ -18,7 +18,6 @@ func New() Model {
 		),
 		spinner:              spiner,
 		selectedApplication:  "No application selected",
-		focused:              false,
 		isLoadingApplication: false,
 	}
 }
@@ -29,5 +28,4 @@ type Model struct {
 	jobs                 []string
 	selectedApplication  string
 	spinner              spinner.Model
-	focused              bool
 }
