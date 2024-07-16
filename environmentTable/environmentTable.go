@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/FredrikMWold/radix-tui/applicationTable"
+	"github.com/FredrikMWold/radix-tui/styles"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -16,18 +17,8 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "tab":
-			if m.table.Focused() {
-				m.table.Blur()
-			} else {
-				m.table.Focus()
-			}
-		}
 	case applicationTable.SelectedApplication:
 		m.isLoadingApplication = true
-
 	case applicationTable.Application:
 		m.isLoadingApplication = false
 		enviroments := make([]table.Row, len(msg.Environments))
@@ -38,10 +29,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	}
 
-	var tableCmd tea.Cmd
-	m.table, tableCmd = m.table.Update(msg)
-	cmds = append(cmds, tableCmd)
-
 	var spinnerCmd tea.Cmd
 	m.spinner, spinnerCmd = m.spinner.Update(msg)
 	cmds = append(cmds, spinnerCmd)
@@ -50,23 +37,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	var enviromentTable string
+	var section string
+	var table string
 	if m.isLoadingApplication && m.table.Rows() == nil {
-		enviromentTable = lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			Height(m.table.Height() + 2).
-			Width(30).
-			AlignHorizontal(lipgloss.Center).
-			AlignVertical(lipgloss.Center).
-			BorderForeground(lipgloss.Color("12")).
+		table = styles.LoadingSpinnerContainer(m.table.Height()+3, 30).
 			Render(fmt.Sprintf("Loading applications " + m.spinner.View()))
 	} else {
-		enviromentTable = baseStyle.Render(m.table.View())
+		table = m.table.View()
 	}
 	if m.table.Rows() != nil && m.isLoadingApplication {
-		enviromentTable = lipgloss.JoinVertical(lipgloss.Center, "Environments "+m.spinner.View(), enviromentTable)
+		section = lipgloss.JoinVertical(lipgloss.Center, "Environments "+m.spinner.View(), table)
 	} else {
-		enviromentTable = lipgloss.JoinVertical(lipgloss.Center, "Environments", enviromentTable)
+		section = lipgloss.JoinVertical(lipgloss.Center, "Environments", table)
 	}
-	return enviromentTable
+	return styles.SectionContainer(false).Render(section)
 }

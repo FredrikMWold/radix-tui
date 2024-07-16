@@ -1,6 +1,7 @@
 package applicationTable
 
 import (
+	"github.com/FredrikMWold/radix-tui/styles"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/lipgloss"
@@ -10,7 +11,6 @@ func New() Model {
 	applicationColumns := []table.Column{
 		{Title: "name", Width: 28},
 	}
-
 	spiner := spinner.New()
 	spiner.Spinner = spinner.Meter
 	spiner.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
@@ -20,10 +20,11 @@ func New() Model {
 			table.WithColumns(applicationColumns),
 			table.WithFocused(true),
 			table.WithHeight(8),
-			table.WithStyles(TableStyles()),
+			table.WithStyles(styles.TableStyles()),
 		),
 		spinner:               spiner,
 		isLoadingApplications: true,
+		focused:               true,
 	}
 }
 
@@ -32,6 +33,7 @@ type Model struct {
 	spinner               spinner.Model
 	isLoadingApplications bool
 	selectedApp           string
+	focused               bool
 }
 
 type Application struct {

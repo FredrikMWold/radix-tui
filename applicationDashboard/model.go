@@ -1,4 +1,4 @@
-package main
+package appllicationDashboard
 
 import (
 	"github.com/FredrikMWold/radix-tui/applicationTable"
@@ -7,13 +7,21 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type Focused int
+
+const (
+	application Focused = iota
+	pipeline
+)
+
 type Model struct {
-	applicationsTable tea.Model
-	pipelineTable     tea.Model
+	applicationsTable applicationTable.Model
+	pipelineTable     pipelineTable.Model
 	enviromentTable   tea.Model
+	focused           Focused
 }
 
-func initialModel() Model {
+func New() Model {
 
 	applicationTable := applicationTable.New()
 	pipelineTable := pipelineTable.New()
@@ -23,5 +31,6 @@ func initialModel() Model {
 		applicationsTable: applicationTable,
 		pipelineTable:     pipelineTable,
 		enviromentTable:   enviromentTable,
+		focused:           application,
 	}
 }

@@ -3,6 +3,7 @@ package applicationTable
 import (
 	"fmt"
 
+	"github.com/FredrikMWold/radix-tui/styles"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -12,27 +13,22 @@ func (m Model) Init() tea.Cmd {
 	return tea.Batch(tick(), m.spinner.Tick, getApplications)
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "enter", "ctrl+r":
-			m.selectedApp = m.table.SelectedRow()[0]
-			return m, tea.Batch(
-				getApplicationData(m.selectedApp),
-				selectApplication(m.selectedApp),
-			)
-
-		case "tab":
-			if m.table.Focused() {
-				m.table.Blur()
-			} else {
-				m.table.Focus()
+			if len(m.table.SelectedRow()) > 0 {
+				m.selectedApp = m.table.SelectedRow()[0]
+				return m, tea.Batch(
+					getApplicationData(m.selectedApp),
+					selectApplication(m.selectedApp),
+				)
 			}
 		}
 	case tea.WindowSizeMsg:
-		m.table.SetHeight(msg.Height - 14)
+		m.table.SetHeight(msg.Height - 16)
 
 	case UpdateApplicationDataTick:
 		if m.selectedApp != "" {
@@ -64,17 +60,26 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	var applicationsTable string
+	var section string
+	var table string
 	if m.isLoadingApplications {
-		applicationsTable = loadingStyles(m.table.Height() + 2).
+		table = styles.LoadingSpinnerContainer(m.table.Height()+3, 30).
 			Render(fmt.Sprintf("Loading applications " + m.spinner.View()))
 	} else {
-		applicationsTable = baseStyle.Render(m.table.View())
+		table = m.table.View()
 	}
 	if m.table.Rows() != nil && m.isLoadingApplications {
-		applicationsTable = lipgloss.JoinVertical(lipgloss.Center, "Applications "+m.spinner.View(), applicationsTable)
+		section = lipgloss.JoinVertical(lipgloss.Center, "Applications "+m.spinner.View(), table)
 	} else {
-		applicationsTable = lipgloss.JoinVertical(lipgloss.Center, "Applications", applicationsTable)
+		section = lipgloss.JoinVertical(lipgloss.Center, "Applications", table)
 	}
-	return applicationsTable
+	return styles.SectionContainer(m.focused).Render(section)
+}
+
+func (m *Model) Focus() {
+	m.focused = true
+}
+
+func (m *Model) Blur() {
+	m.focused = false
 }

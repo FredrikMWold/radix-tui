@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/FredrikMWold/radix-tui/applicationTable"
+	"github.com/FredrikMWold/radix-tui/styles"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,8 +15,8 @@ func (m Model) Init() tea.Cmd {
 	return tea.Batch(m.spinner.Tick)
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		var columns = []table.Column{
@@ -25,7 +26,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			{Title: "status", Width: (msg.Width - 44) / 5},
 			{Title: "created", Width: (msg.Width - 44) / 5},
 		}
-		m.table.SetHeight(msg.Height - 5)
+		m.table.SetHeight(msg.Height - 6)
 		m.table.SetWidth(msg.Width - 34)
 		m.table.SetColumns(columns)
 
@@ -47,30 +48,37 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.table.SetRows(jobs)
 	}
 
-	m.spinner, cmd = m.spinner.Update(msg)
-	return m, cmd
+	var tableCmd, spinnerCmd tea.Cmd
+	m.table, tableCmd = m.table.Update(msg)
+	cmds = append(cmds, tableCmd)
+
+	m.spinner, spinnerCmd = m.spinner.Update(msg)
+	cmds = append(cmds, spinnerCmd)
+	return m, tea.Batch(cmds...)
 }
 
 func (m Model) View() string {
-	var pipelineJobs string
+	var section string
+	var table string
 	if m.isLoadingApplication && m.table.Rows() == nil {
-		pipelineJobs = lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("12")).
-			Height(m.table.Height() + 2).
-			Width(m.table.Width()).
-			AlignVertical(lipgloss.Center).
-			AlignHorizontal(lipgloss.Center).
+		table = styles.LoadingSpinnerContainer(m.table.Height()+3, m.table.Width()).
 			Render(fmt.Sprintf("Loading pipeline jobs " + m.spinner.View()))
 	} else {
-		pipelineJobs = baseStyle.Render(m.table.View())
+		table = m.table.View()
 	}
-
 	if m.table.Rows() != nil && m.isLoadingApplication {
-		pipelineJobs = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication+" "+m.spinner.View(), pipelineJobs)
+		section = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication+" "+m.spinner.View(), table)
 	} else {
-		pipelineJobs = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication, pipelineJobs)
+		section = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication, table)
 	}
 
-	return pipelineJobs
+	return styles.SectionContainer(m.focused).Render(section)
+}
+
+func (m *Model) Focus() {
+	m.focused = true
+}
+
+func (m *Model) Blur() {
+	m.focused = false
 }
