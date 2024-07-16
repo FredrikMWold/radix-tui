@@ -1,7 +1,7 @@
 package environmentTable
 
 import (
-	appTable "github.com/FredrikMWold/radix-tui/applicationTable"
+	"github.com/FredrikMWold/radix-tui/applicationTable"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/lipgloss"
@@ -21,7 +21,7 @@ func New() Model {
 		table: table.New(
 			table.WithFocused(false),
 			table.WithHeight(4),
-			table.WithStyles(appTable.TableStyles()),
+			table.WithStyles(applicationTable.TableStyles()),
 			table.WithColumns([]table.Column{
 				{Title: "name", Width: 7},
 				{Title: "status", Width: 10},

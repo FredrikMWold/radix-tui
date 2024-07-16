@@ -10,11 +10,15 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type UpdateApplicationDataTick time.Time
+
 func tick() tea.Cmd {
 	return tea.Tick(time.Second*10, func(t time.Time) tea.Msg {
 		return UpdateApplicationDataTick(t)
 	})
 }
+
+type Applications []string
 
 func getApplicationData(application string) tea.Cmd {
 	return func() tea.Msg {
@@ -31,6 +35,8 @@ func getApplicationData(application string) tea.Cmd {
 		return application
 	}
 }
+
+type SelectedApplication string
 
 func selectApplication(application string) tea.Cmd {
 	return func() tea.Msg {

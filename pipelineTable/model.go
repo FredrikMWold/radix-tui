@@ -15,12 +15,14 @@ func New() Model {
 			table.WithFocused(false),
 			table.WithStyles(getInfoTableStyles()),
 		),
-		spinner: spiner,
+		spinner:             spiner,
+		selectedApplication: "No application selected",
 	}
 }
 
 type Model struct {
 	table                table.Model
 	isLoadingApplication bool
+	selectedApplication  string
 	spinner              spinner.Model
 }

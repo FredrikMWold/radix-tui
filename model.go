@@ -1,22 +1,23 @@
 package main
 
 import (
-	appTable "github.com/FredrikMWold/radix-tui/applicationTable"
-	envTable "github.com/FredrikMWold/radix-tui/environmentTable"
-	pipeTable "github.com/FredrikMWold/radix-tui/pipelineTable"
+	"github.com/FredrikMWold/radix-tui/applicationTable"
+	"github.com/FredrikMWold/radix-tui/environmentTable"
+	"github.com/FredrikMWold/radix-tui/pipelineTable"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 type Model struct {
-	applicationsTable appTable.Model
-	pipelineTable     pipeTable.Model
-	enviromentTable   envTable.Model
+	applicationsTable tea.Model
+	pipelineTable     tea.Model
+	enviromentTable   tea.Model
 }
 
 func initialModel() Model {
 
-	applicationTable := appTable.New()
-	pipelineTable := pipeTable.New()
-	enviromentTable := envTable.New()
+	applicationTable := applicationTable.New()
+	pipelineTable := pipelineTable.New()
+	enviromentTable := environmentTable.New()
 
 	return Model{
 		applicationsTable: applicationTable,

@@ -3,7 +3,7 @@ package environmentTable
 import (
 	"fmt"
 
-	appTable "github.com/FredrikMWold/radix-tui/applicationTable"
+	"github.com/FredrikMWold/radix-tui/applicationTable"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -13,7 +13,7 @@ func (m Model) Init() tea.Cmd {
 	return (m.spinner.Tick)
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -25,10 +25,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 				m.table.Focus()
 			}
 		}
-	case appTable.SelectedApplication:
+	case applicationTable.SelectedApplication:
 		m.isLoadingApplication = true
 
-	case appTable.Application:
+	case applicationTable.Application:
 		m.isLoadingApplication = false
 		enviroments := make([]table.Row, len(msg.Environments))
 		for i, env := range msg.Environments {

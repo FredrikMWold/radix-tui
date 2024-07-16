@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	appTable "github.com/FredrikMWold/radix-tui/applicationTable"
+	"github.com/FredrikMWold/radix-tui/applicationTable"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -14,7 +14,7 @@ func (m Model) Init() tea.Cmd {
 	return tea.Batch(m.spinner.Tick)
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -29,10 +29,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.table.SetWidth(msg.Width - 34)
 		m.table.SetColumns(columns)
 
-	case appTable.SelectedApplication:
+	case applicationTable.SelectedApplication:
 		m.isLoadingApplication = true
+		m.selectedApplication = string(msg)
 
-	case appTable.Application:
+	case applicationTable.Application:
 		m.isLoadingApplication = false
 		jobs := make([]table.Row, len(msg.Jobs))
 		for i, job := range msg.Jobs {
@@ -66,9 +67,9 @@ func (m Model) View() string {
 	}
 
 	if m.table.Rows() != nil && m.isLoadingApplication {
-		pipelineJobs = lipgloss.JoinVertical(lipgloss.Center, "Pipeline jobs "+m.spinner.View(), pipelineJobs)
+		pipelineJobs = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication+" "+m.spinner.View(), pipelineJobs)
 	} else {
-		pipelineJobs = lipgloss.JoinVertical(lipgloss.Center, "Pipeline jobs", pipelineJobs)
+		pipelineJobs = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication, pipelineJobs)
 	}
 
 	return pipelineJobs
