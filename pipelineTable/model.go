@@ -26,6 +26,7 @@ func New() Model {
 type Model struct {
 	table                table.Model
 	isLoadingApplication bool
+	jobs                 []string
 	selectedApplication  string
 	spinner              spinner.Model
 	focused              bool

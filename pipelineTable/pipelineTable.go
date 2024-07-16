@@ -2,6 +2,7 @@ package pipelineTable
 
 import (
 	"fmt"
+	"os/exec"
 	"time"
 
 	"github.com/FredrikMWold/radix-tui/applicationTable"
@@ -18,10 +19,15 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "enter":
+			m.openJobInBrowser()
+		}
 	case tea.WindowSizeMsg:
 		var columns = []table.Column{
-			{Title: "name", Width: (msg.Width - 44) / 5},
-			{Title: "branch", Width: (msg.Width - 44) / 5},
+			{Title: "Triggered by", Width: (msg.Width - 44) / 5},
+			{Title: "Environment", Width: (msg.Width - 44) / 5},
 			{Title: "pipeline", Width: (msg.Width - 44) / 5},
 			{Title: "status", Width: (msg.Width - 44) / 5},
 			{Title: "created", Width: (msg.Width - 44) / 5},
@@ -36,16 +42,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 	case applicationTable.Application:
 		m.isLoadingApplication = false
-		jobs := make([]table.Row, len(msg.Jobs))
-		for i, job := range msg.Jobs {
-			parsedTime, err := time.Parse(time.RFC3339, job.Created)
-			if err != nil {
-				fmt.Println(err)
-			}
-			job.Created = parsedTime.Format("02.01.2006 15:04:05")
-			jobs[i] = table.Row([]string{job.AppName, job.Branch, job.Pipeline, job.Status, job.Created})
-		}
-		m.table.SetRows(jobs)
+		m.loadApplication(msg)
+
 	}
 
 	var tableCmd, spinnerCmd tea.Cmd
@@ -81,4 +79,26 @@ func (m *Model) Focus() {
 
 func (m *Model) Blur() {
 	m.focused = false
+}
+
+func (m *Model) loadApplication(application applicationTable.Application) {
+	rows := make([]table.Row, len(application.Jobs))
+	jobs := make([]string, len(application.Jobs))
+	for i, job := range application.Jobs {
+		parsedTime, err := time.Parse(time.RFC3339, job.Created)
+		if err != nil {
+			fmt.Println(err)
+		}
+		job.Created = parsedTime.Format("02.01.2006 15:04:05")
+		rows[i] = table.Row([]string{job.TriggeredBy, job.Environments[0], job.Pipeline, job.Status, job.Created})
+		jobs[i] = job.Name
+	}
+	m.table.SetRows(rows)
+	m.jobs = jobs
+}
+
+func (m Model) openJobInBrowser() {
+	tableCursor := m.table.Cursor()
+	url := fmt.Sprintf("https://console.radix.equinor.com/applications/%s/jobs/view/%s", m.selectedApplication, m.jobs[tableCursor])
+	exec.Command("open", url).Start()
 }

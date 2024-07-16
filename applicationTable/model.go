@@ -42,11 +42,12 @@ type Application struct {
 }
 
 type Job struct {
-	AppName  string `json:"appName"`
-	Branch   string `json:"branch"`
-	Pipeline string `json:"pipeline"`
-	Status   string `json:"status"`
-	Created  string `json:"created"`
+	Name         string   `json:"name"`
+	TriggeredBy  string   `json:"triggeredBy"`
+	Environments []string `json:"environments"`
+	Pipeline     string   `json:"pipeline"`
+	Status       string   `json:"status"`
+	Created      string   `json:"created"`
 }
 
 type Environment struct {
