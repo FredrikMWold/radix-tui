@@ -93,7 +93,11 @@ func (m *Model) loadApplication(application applicationTable.Application) {
 			fmt.Println(err)
 		}
 		job.Created = parsedTime.Format("02.01.2006 15:04:05")
-		rows[i] = table.Row([]string{job.TriggeredBy, job.Environments[0], job.Pipeline, job.Status, job.Created})
+		environment := "No environment"
+		if len(job.Environments) > 0 {
+			environment = job.Environments[0]
+		}
+		rows[i] = table.Row([]string{job.TriggeredBy, environment, job.Pipeline, job.Status, job.Created})
 		jobs[i] = job.Name
 	}
 	m.table.SetRows(rows)
