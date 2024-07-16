@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/FredrikMWold/radix-tui/compare/v1.1.0...v1.1.1) (2024-07-16)
+
+
+### Bug Fixes
+
+* only start auto update tick after user selects a application ([591e8f6](https://github.com/FredrikMWold/radix-tui/commit/591e8f648b354a9e468cd501da199e6810f34ed1))
+
 ## [1.1.0](https://github.com/FredrikMWold/radix-tui/compare/v1.0.1...v1.1.0) (2024-07-16)
 
 
