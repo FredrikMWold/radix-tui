@@ -17,7 +17,7 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	switch msg := msg.(type) {
-	case applicationTable.SelectedApplication:
+	case applicationTable.SelectedApplication, applicationTable.UpdateApplicationDataTick:
 		m.isLoadingApplication = true
 	case applicationTable.Application:
 		m.isLoadingApplication = false

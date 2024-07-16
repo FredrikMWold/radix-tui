@@ -40,6 +40,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.isLoadingApplication = true
 		m.selectedApplication = string(msg)
 
+	case applicationTable.UpdateApplicationDataTick:
+		m.isLoadingApplication = true
+
 	case applicationTable.Application:
 		m.isLoadingApplication = false
 		m.loadApplication(msg)

@@ -26,7 +26,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.applicationsTable, cmd = m.applicationsTable.Update(msg)
 			return m, cmd
 		}
-	case tea.WindowSizeMsg, applicationTable.SelectedApplication, applicationTable.Application, spinner.TickMsg:
+	case tea.WindowSizeMsg, applicationTable.SelectedApplication, applicationTable.Application, spinner.TickMsg, applicationTable.UpdateApplicationDataTick:
 		var appCmds, pipeCmds, envCmds tea.Cmd
 		m.applicationsTable, appCmds = m.applicationsTable.Update(msg)
 		m.pipelineTable, pipeCmds = m.pipelineTable.Update(msg)
