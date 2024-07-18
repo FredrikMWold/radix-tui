@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/FredrikMWold/radix-tui/compare/v1.4.0...v1.5.0) (2024-07-18)
+
+
+### Features
+
+* adds ability to create new build-deploy pipelines ([b84cbd3](https://github.com/FredrikMWold/radix-tui/commit/b84cbd384df98c7065e7742f4f8d172d45c0494c))
+
+
+### Bug Fixes
+
+* adds refresh help text ([cc0dff0](https://github.com/FredrikMWold/radix-tui/commit/cc0dff034a28d3123fe6e62873ec97e19bbe37e9))
+* reshing in form would cause wrong help text to be displayed ([cc0dff0](https://github.com/FredrikMWold/radix-tui/commit/cc0dff034a28d3123fe6e62873ec97e19bbe37e9))
+
 ## [1.4.0](https://github.com/FredrikMWold/radix-tui/compare/v1.3.0...v1.4.0) (2024-07-18)
 
 
