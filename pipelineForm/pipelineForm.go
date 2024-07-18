@@ -19,32 +19,31 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.form.WithWidth(msg.Width - 12)
 		m.width = msg.Width
 	case commands.Application:
-		var environments []string
-		var branches []string
+		var options []string
 		for _, env := range msg.Environments {
-			environments = append(environments, env.Name)
 			if env.BranchMapping != "" {
-				branches = append(branches, env.BranchMapping)
+				key := env.BranchMapping + " -> " + env.Name
+				m.branchMapping[key] = env.BranchMapping
+				options = append(options, key)
 			}
 		}
 		m.form = huh.NewForm(
 			huh.NewGroup(
 				huh.NewSelect[string]().
 					Key("environment").
-					Options(huh.NewOptions(environments...)...).
+					Options(huh.NewOptions(options...)...).
 					Title("Environment").
 					Description("Select the environment you want to deploy to").
-					WithTheme(huh.ThemeCatppuccin()),
-				huh.NewSelect[string]().
-					Key("branch").
-					Options(huh.NewOptions(branches...)...).
-					Title("Pipeline Type").
-					Description("Select the type of pipeline you want to create").
 					WithTheme(huh.ThemeCatppuccin()),
 			).WithWidth(m.width),
 		)
 		m.SelectedApplication = msg.Name
 		return m, m.form.Init()
+	}
+
+	if m.form.State == huh.StateCompleted {
+		m.form.State = huh.StateAborted
+		return m, commands.BuildAndDeploy(m.SelectedApplication, m.branchMapping[m.form.GetString("environment")])
 	}
 
 	form, cmd := m.form.Update(msg)

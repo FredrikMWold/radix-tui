@@ -1,13 +1,12 @@
 package applicationTable
 
 import (
+	"github.com/FredrikMWold/radix-tui/commands"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type SelectedApplication string
-
 func selectApplication(application string) tea.Cmd {
 	return func() tea.Msg {
-		return SelectedApplication(application)
+		return commands.SelectedApplication(application)
 	}
 }

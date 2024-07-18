@@ -82,44 +82,44 @@ func (k keyMap) FullHelp() [][]key.Binding {
 var ApplicationTableKeys = keyMap{
 	Enter: key.NewBinding(
 		key.WithKeys("enter"),
-		key.WithHelp("enter", "Select Application"),
+		key.WithHelp("enter", "select application"),
 	),
 	Up: key.NewBinding(
 		key.WithKeys("up"),
-		key.WithHelp("up", "Move up"),
+		key.WithHelp("up", "move up"),
 	),
 	Down: key.NewBinding(
 		key.WithKeys("down"),
-		key.WithHelp("down", "Move down"),
+		key.WithHelp("down", "move down"),
 	),
 }
 
 var PipelineTableKeys = keyMap{
 	Enter: key.NewBinding(
 		key.WithKeys("enter"),
-		key.WithHelp("enter", "Open in browser"),
+		key.WithHelp("enter", "open"),
 	),
 	Up: key.NewBinding(
 		key.WithKeys("up"),
-		key.WithHelp("up", "Move up"),
+		key.WithHelp("up", "move up"),
 	),
 	Down: key.NewBinding(
 		key.WithKeys("down"),
-		key.WithHelp("down", "Move down"),
+		key.WithHelp("down", "move down"),
 	),
 	Esc: key.NewBinding(
 		key.WithKeys("esc"),
-		key.WithHelp("esc", "Back"),
+		key.WithHelp("esc", "back"),
 	),
 	BuildDeploy: key.NewBinding(
 		key.WithKeys("ctrl+n"),
-		key.WithHelp("ctrl+n", "Create build-deploy pipeline"),
+		key.WithHelp("ctrl+n", "build-deploy"),
 	),
 }
 
 var BuildDeployFormKeys = keyMap{
 	Esc: key.NewBinding(
 		key.WithKeys("esc"),
-		key.WithHelp("esc", "Back"),
+		key.WithHelp("esc", "back"),
 	),
 }

@@ -10,6 +10,7 @@ import (
 )
 
 type Applications []string
+type SelectedApplication string
 
 func GetApplications() tea.Msg {
 	result := exec.Command("rx", "get", "application")
@@ -23,6 +24,20 @@ func GetApplications() tea.Msg {
 		application_list = GetApplications().(Applications)
 	}
 	return Applications(application_list)
+}
+
+type CreatedPipelineJob string
+
+func BuildAndDeploy(application string, branch string) tea.Cmd {
+	return func() tea.Msg {
+		result := exec.Command("rx", "create", "pipeline-job", "build-deploy", "-a", application, "-b", branch)
+		_, err := result.Output()
+		if err != nil {
+			fmt.Println(err)
+		}
+		return SelectedApplication(application)
+	}
+
 }
 
 func GetApplicationData(application string) tea.Cmd {

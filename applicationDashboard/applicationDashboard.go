@@ -1,7 +1,6 @@
 package appllicationDashboard
 
 import (
-	"github.com/FredrikMWold/radix-tui/applicationTable"
 	"github.com/FredrikMWold/radix-tui/commands"
 	"github.com/FredrikMWold/radix-tui/styles"
 	tea "github.com/charmbracelet/bubbletea"
@@ -52,7 +51,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case commands.Applications:
 		m.applications = msg
 
-	case applicationTable.SelectedApplication:
+	case commands.SelectedApplication:
 		m.isLoadingApplication = true
 		m.focused = pipeline
 		return m, commands.GetApplicationData(string(msg))

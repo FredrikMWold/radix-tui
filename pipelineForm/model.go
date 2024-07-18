@@ -7,15 +7,13 @@ import (
 type Model struct {
 	form                *huh.Form
 	SelectedApplication string
-	environments        []string
-	branches            []string
+	branchMapping       map[string]string
 	width               int
 }
 
 func New() Model {
 	return Model{
-		environments: []string{},
-		branches:     []string{},
-		form:         huh.NewForm(huh.NewGroup(huh.NewInput().Key("name"))),
+		branchMapping: make(map[string]string),
+		form:          huh.NewForm(huh.NewGroup(huh.NewInput().Key("name"))),
 	}
 }
