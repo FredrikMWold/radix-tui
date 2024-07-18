@@ -5,15 +5,14 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/FredrikMWold/radix-tui/applicationTable"
-	"github.com/FredrikMWold/radix-tui/styles"
+	"github.com/FredrikMWold/radix-tui/commands"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.spinner.Tick)
+	return nil
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -36,49 +35,25 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.table.SetWidth(msg.Width - 34)
 		m.table.SetColumns(columns)
 
-	case applicationTable.SelectedApplication:
-		m.isLoadingApplication = true
-		m.selectedApplication = string(msg)
-
-	case applicationTable.UpdateApplicationDataTick:
-		m.isLoadingApplication = true
-
-	case applicationTable.Application:
-		m.isLoadingApplication = false
+	case commands.Application:
 		m.loadApplication(msg)
-
 	}
 
-	var tableCmd, spinnerCmd tea.Cmd
+	var tableCmd tea.Cmd
 	m.table, tableCmd = m.table.Update(msg)
 	cmds = append(cmds, tableCmd)
 
-	m.spinner, spinnerCmd = m.spinner.Update(msg)
-	cmds = append(cmds, spinnerCmd)
 	return m, tea.Batch(cmds...)
 }
 
 func (m Model) View() string {
-	var section string
-	var table string
-	if m.isLoadingApplication && m.table.Rows() == nil {
-		table = styles.LoadingSpinnerContainer(m.table.Height()+3, m.table.Width()).
-			Render(fmt.Sprintf("Loading pipeline jobs " + m.spinner.View()))
-	} else {
-		table = m.table.View()
-	}
-	if m.table.Rows() != nil && m.isLoadingApplication {
-		section = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication+" "+m.spinner.View(), table)
-	} else {
-		section = lipgloss.JoinVertical(lipgloss.Center, m.selectedApplication, table)
-	}
-
-	return section
+	header := lipgloss.NewStyle().Bold(true).Render("Pipeline jobs")
+	return lipgloss.JoinVertical(lipgloss.Center, header, m.table.View())
 }
 
-func (m *Model) loadApplication(application applicationTable.Application) {
+func (m *Model) loadApplication(application commands.Application) {
+	m.application = application
 	rows := make([]table.Row, len(application.Jobs))
-	jobs := make([]string, len(application.Jobs))
 	for i, job := range application.Jobs {
 		parsedTime, err := time.Parse(time.RFC3339, job.Created)
 		if err != nil {
@@ -90,17 +65,15 @@ func (m *Model) loadApplication(application applicationTable.Application) {
 			environment = job.Environments[0]
 		}
 		rows[i] = table.Row([]string{job.TriggeredBy, environment, job.Pipeline, job.Status, job.Created})
-		jobs[i] = job.Name
 	}
 	m.table.SetRows(rows)
-	m.jobs = jobs
 }
 
 func (m Model) openJobInBrowser() {
-	if len(m.jobs) == 0 {
+	if len(m.application.Jobs) == 0 {
 		return
 	}
 	tableCursor := m.table.Cursor()
-	url := fmt.Sprintf("https://console.radix.equinor.com/applications/%s/jobs/view/%s", m.selectedApplication, m.jobs[tableCursor])
+	url := fmt.Sprintf("https://console.radix.equinor.com/applications/%s/jobs/view/%s", m.application.Name, m.application.Jobs[tableCursor].Name)
 	exec.Command("open", url).Start()
 }

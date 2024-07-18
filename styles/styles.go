@@ -6,13 +6,11 @@ import (
 )
 
 func SectionContainer(isActive bool) lipgloss.Style {
-	styles := lipgloss.NewStyle().BorderStyle(lipgloss.RoundedBorder())
 	if isActive {
-		styles.BorderForeground(lipgloss.Color("26"))
+		return lipgloss.NewStyle().BorderStyle(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#b4befe"))
 	} else {
-		styles.BorderForeground(lipgloss.Color("69"))
+		return lipgloss.NewStyle().BorderStyle(lipgloss.RoundedBorder()).BorderForeground(lipgloss.Color("#6c7086"))
 	}
-	return styles
 }
 
 func LoadingSpinnerContainer(height int, width int) lipgloss.Style {
@@ -32,9 +30,8 @@ func TableStyles() table.Styles {
 		BorderTop(true).
 		Bold(false)
 	tableStyles.Selected = tableStyles.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
-		Bold(false)
+		Foreground(lipgloss.Color("#11111b")).
+		Background(lipgloss.Color("#cba6f7"))
 	return tableStyles
 }
 
