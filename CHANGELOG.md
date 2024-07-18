@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/FredrikMWold/radix-tui/compare/v1.2.0...v1.3.0) (2024-07-18)
+
+
+### Features
+
+* removes auto update application user needs to press ctrl+r ([3aab288](https://github.com/FredrikMWold/radix-tui/commit/3aab288021823c3be68b6a72a78284b710fb21c3))
+
 ## [1.2.0](https://github.com/FredrikMWold/radix-tui/compare/v1.1.1...v1.2.0) (2024-07-16)
 
 
