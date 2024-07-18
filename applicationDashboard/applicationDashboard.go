@@ -54,13 +54,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case commands.SelectedApplication:
 		m.isLoadingApplication = true
 		m.focused = pipeline
+		m.keys = PipelineTableKeys
 		return m, commands.GetApplicationData(string(msg))
 
 	case tea.WindowSizeMsg, commands.Application:
 		var appCmds, pipeCmds, envCmds, formCmds tea.Cmd
 		if _, ok := msg.(commands.Application); ok {
 			m.isLoadingApplication = false
-			m.keys = PipelineTableKeys
 			m.application = msg.(commands.Application)
 		}
 		if _, ok := msg.(tea.WindowSizeMsg); ok {

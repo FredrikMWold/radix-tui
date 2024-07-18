@@ -67,15 +67,16 @@ type keyMap struct {
 	Down        key.Binding
 	Esc         key.Binding
 	BuildDeploy key.Binding
+	Refresh     key.Binding
 }
 
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Enter, k.Up, k.Down, k.Esc, k.BuildDeploy}
+	return []key.Binding{k.Enter, k.BuildDeploy, k.Refresh, k.Up, k.Down, k.Esc}
 }
 
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Enter, k.Up, k.Down, k.Esc, k.BuildDeploy},
+		{k.Enter, k.BuildDeploy, k.Refresh, k.Up, k.Down, k.Esc},
 	}
 }
 
@@ -99,6 +100,14 @@ var PipelineTableKeys = keyMap{
 		key.WithKeys("enter"),
 		key.WithHelp("enter", "open"),
 	),
+	BuildDeploy: key.NewBinding(
+		key.WithKeys("ctrl+n"),
+		key.WithHelp("ctrl+n", "build-deploy"),
+	),
+	Refresh: key.NewBinding(
+		key.WithKeys("ctrl+r"),
+		key.WithHelp("ctrl+r", "refresh"),
+	),
 	Up: key.NewBinding(
 		key.WithKeys("up"),
 		key.WithHelp("up", "move up"),
@@ -111,15 +120,15 @@ var PipelineTableKeys = keyMap{
 		key.WithKeys("esc"),
 		key.WithHelp("esc", "back"),
 	),
-	BuildDeploy: key.NewBinding(
-		key.WithKeys("ctrl+n"),
-		key.WithHelp("ctrl+n", "build-deploy"),
-	),
 }
 
 var BuildDeployFormKeys = keyMap{
 	Esc: key.NewBinding(
 		key.WithKeys("esc"),
 		key.WithHelp("esc", "back"),
+	),
+	Refresh: key.NewBinding(
+		key.WithKeys("ctrl+r"),
+		key.WithHelp("ctrl+r", "refresh"),
 	),
 }
