@@ -22,7 +22,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			}
 		}
 	case tea.WindowSizeMsg:
-		m.table.SetHeight(msg.Height - 17)
+		m.table.SetHeight(msg.Height - 18)
 
 	case commands.Applications:
 		m.isLoadingApplications = false

@@ -36,13 +36,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+n":
 			if m.focused == pipeline {
 				m.focused = form
+				m.keys = BuildDeployFormKeys
 			}
 		case "esc":
 			if m.focused == pipeline {
 				m.focused = application
+				m.keys = ApplicationTableKeys
 			}
 			if m.focused != application {
 				m.focused = pipeline
+				m.keys = PipelineTableKeys
 			}
 		}
 
@@ -58,11 +61,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var appCmds, pipeCmds, envCmds, formCmds tea.Cmd
 		if _, ok := msg.(commands.Application); ok {
 			m.isLoadingApplication = false
+			m.keys = PipelineTableKeys
 			m.application = msg.(commands.Application)
 		}
 		if _, ok := msg.(tea.WindowSizeMsg); ok {
 			m.height = msg.(tea.WindowSizeMsg).Height
 			m.width = msg.(tea.WindowSizeMsg).Width
+			m.help.Width = msg.(tea.WindowSizeMsg).Width
 		}
 		m.applicationsTable, appCmds = m.applicationsTable.Update(msg)
 		m.pipelineTable, pipeCmds = m.pipelineTable.Update(msg)
@@ -113,7 +118,7 @@ func (m Model) View() string {
 			m.getEnvironemntTableView(),
 		),
 		m.getActivePageView(),
-	)
+	) + "\n" + m.help.View(m.keys)
 }
 
 func (m Model) getActivePageView() string {
@@ -122,7 +127,7 @@ func (m Model) getActivePageView() string {
 			AlignHorizontal(lipgloss.Center).
 			AlignVertical(lipgloss.Center).
 			Width(m.width - 34).
-			Height(m.height - 2).
+			Height(m.height - 3).
 			Render("Loading application data " + m.spinner.View())
 	}
 	if m.focused == pipeline {
@@ -132,12 +137,12 @@ func (m Model) getActivePageView() string {
 	if m.focused == form {
 		return styles.SectionContainer(true).
 			Width(m.width - 34).
-			Height(m.height - 2).
+			Height(m.height - 3).
 			Render(m.pipelineForm.View())
 	}
 	return styles.SectionContainer(false).
 		Width(m.width - 34).
-		Height(m.height - 2).
+		Height(m.height - 3).
 		AlignHorizontal(lipgloss.Center).
 		AlignVertical(lipgloss.Center).
 		Render("Select an application")

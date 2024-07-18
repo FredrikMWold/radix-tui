@@ -31,7 +31,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			{Title: "status", Width: (msg.Width - 44) / 5},
 			{Title: "created", Width: (msg.Width - 44) / 5},
 		}
-		m.table.SetHeight(msg.Height - 6)
+		m.table.SetHeight(msg.Height - 7)
 		m.table.SetWidth(msg.Width - 34)
 		m.table.SetColumns(columns)
 

@@ -16,7 +16,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.width = msg.Width - 34
+		m.form.WithWidth(msg.Width - 12)
+		m.width = msg.Width
 	case commands.Application:
 		var environments []string
 		var branches []string
@@ -40,8 +41,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					Title("Pipeline Type").
 					Description("Select the type of pipeline you want to create").
 					WithTheme(huh.ThemeCatppuccin()),
-			),
-		).WithWidth(m.width).WithShowHelp(false)
+			).WithWidth(m.width),
+		)
 		m.SelectedApplication = msg.Name
 		return m, m.form.Init()
 	}
@@ -56,5 +57,5 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	var formHeader = lipgloss.NewStyle().Padding(0, 0, 1, 0).Bold(true).Render("Build and deploy")
-	return lipgloss.JoinVertical(lipgloss.Center, formHeader, m.form.View())
+	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(m.width-34, lipgloss.Center, formHeader), m.form.View())
 }
