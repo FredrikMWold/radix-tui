@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/FredrikMWold/radix-tui/compare/v1.3.0...v1.4.0) (2024-07-18)
+
+
+### Features
+
+* adds helper text to the different pages ([05ea337](https://github.com/FredrikMWold/radix-tui/commit/05ea337db8ed8dccc797a88995baf77d5f4c9b80))
+
 ## [1.3.0](https://github.com/FredrikMWold/radix-tui/compare/v1.2.0...v1.3.0) (2024-07-18)
 
 
