@@ -17,7 +17,7 @@ func NewForm() *huh.Form {
 				Key("applyConfig").
 				Affirmative("Create job").
 				Negative("Cancel").
-				WithTheme(huh.ThemeCatppuccin()).
+				WithTheme(huh.ThemeCatppuccin()),
 		),
 	)
 }
