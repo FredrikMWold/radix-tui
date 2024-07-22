@@ -1,4 +1,4 @@
-package environmentTable
+package environmenttable
 
 import (
 	"github.com/FredrikMWold/radix-tui/commands"

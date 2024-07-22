@@ -1,4 +1,4 @@
-package pipelineForm
+package pipelineform
 
 import (
 	"github.com/charmbracelet/huh"

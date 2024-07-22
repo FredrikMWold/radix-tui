@@ -1,4 +1,4 @@
-package applicationTable
+package applicationtable
 
 import (
 	"github.com/FredrikMWold/radix-tui/styles"

@@ -1,4 +1,4 @@
-package appllicationDashboard
+package appllicationdashboard
 
 import (
 	"github.com/FredrikMWold/radix-tui/commands"
@@ -118,52 +118,4 @@ func (m Model) View() string {
 		),
 		m.getActivePageView(),
 	) + "\n" + m.help.View(m.keys)
-}
-
-func (m Model) getActivePageView() string {
-	if m.isLoadingApplication {
-		return styles.SectionContainer(true).
-			AlignHorizontal(lipgloss.Center).
-			AlignVertical(lipgloss.Center).
-			Width(m.width - 34).
-			Height(m.height - 3).
-			Render("Loading application data " + m.spinner.View())
-	}
-	if m.focused == pipeline {
-		return styles.SectionContainer(true).
-			Render(m.pipelineTable.View())
-	}
-	if m.focused == form {
-		return styles.SectionContainer(true).
-			Width(m.width - 34).
-			Height(m.height - 3).
-			Render(m.pipelineForm.View())
-	}
-	return styles.SectionContainer(false).
-		Width(m.width - 34).
-		Height(m.height - 3).
-		AlignHorizontal(lipgloss.Center).
-		AlignVertical(lipgloss.Center).
-		Render("Select an application")
-}
-
-func (m Model) getEnvironemntTableView() string {
-	if m.focused == application {
-		return styles.SectionContainer(false).
-			Width(30).
-			Height(9).
-			AlignHorizontal(lipgloss.Center).
-			AlignVertical(lipgloss.Center).
-			Render("Select an application")
-	}
-	if m.isLoadingApplication {
-		return styles.SectionContainer(false).
-			Width(30).
-			Height(9).
-			AlignHorizontal(lipgloss.Center).
-			AlignVertical(lipgloss.Center).
-			Render("Loading application data " + m.spinner.View())
-	}
-	return styles.SectionContainer(false).
-		Render(m.enviromentTable.View())
 }

@@ -1,4 +1,4 @@
-package pipelineTable
+package pipelinetable
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package pipelineTable
+package pipelinetable
 
 import (
 	"github.com/FredrikMWold/radix-tui/commands"

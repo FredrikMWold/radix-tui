@@ -1,11 +1,12 @@
-package appllicationDashboard
+package appllicationdashboard
 
 import (
-	"github.com/FredrikMWold/radix-tui/applicationTable"
+	applicationtable "github.com/FredrikMWold/radix-tui/applicationTable"
 	"github.com/FredrikMWold/radix-tui/commands"
-	"github.com/FredrikMWold/radix-tui/environmentTable"
-	"github.com/FredrikMWold/radix-tui/pipelineForm"
-	"github.com/FredrikMWold/radix-tui/pipelineTable"
+	environmenttable "github.com/FredrikMWold/radix-tui/environmentTable"
+	pipelineform "github.com/FredrikMWold/radix-tui/pipelineForm"
+	pipelinetable "github.com/FredrikMWold/radix-tui/pipelineTable"
+	"github.com/FredrikMWold/radix-tui/styles"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -22,27 +23,27 @@ const (
 )
 
 type Model struct {
-	applicationsTable    applicationTable.Model
-	keys                 keyMap
-	pipelineTable        pipelineTable.Model
-	spinner              spinner.Model
-	help                 help.Model
-	pipelineForm         tea.Model
+	applicationsTable    applicationtable.Model
+	pipelineTable        pipelinetable.Model
 	enviromentTable      tea.Model
+	pipelineForm         tea.Model
+	spinner              spinner.Model
+	keys                 keyMap
+	help                 help.Model
+	application          commands.Application
 	focused              Focused
-	applications         []string
 	isLoadingApplication bool
 	height               int
 	width                int
-	application          commands.Application
+	applications         []string
 }
 
 func New() Model {
 
-	applicationTable := applicationTable.New()
-	pipelineTable := pipelineTable.New()
-	enviromentTable := environmentTable.New()
-	pipelineForm := pipelineForm.New()
+	applicationTable := applicationtable.New()
+	pipelineTable := pipelinetable.New()
+	enviromentTable := environmenttable.New()
+	pipelineForm := pipelineform.New()
 
 	spiner := spinner.New()
 	spiner.Spinner = spinner.Meter
@@ -80,55 +81,50 @@ func (k keyMap) FullHelp() [][]key.Binding {
 	}
 }
 
-var ApplicationTableKeys = keyMap{
-	Enter: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("enter", "select application"),
-	),
-	Up: key.NewBinding(
-		key.WithKeys("up"),
-		key.WithHelp("up", "move up"),
-	),
-	Down: key.NewBinding(
-		key.WithKeys("down"),
-		key.WithHelp("down", "move down"),
-	),
+func (m Model) getActivePageView() string {
+	if m.isLoadingApplication {
+		return styles.SectionContainer(true).
+			AlignHorizontal(lipgloss.Center).
+			AlignVertical(lipgloss.Center).
+			Width(m.width - 34).
+			Height(m.height - 3).
+			Render("Loading application data " + m.spinner.View())
+	}
+	if m.focused == pipeline {
+		return styles.SectionContainer(true).
+			Render(m.pipelineTable.View())
+	}
+	if m.focused == form {
+		return styles.SectionContainer(true).
+			Width(m.width - 34).
+			Height(m.height - 3).
+			Render(m.pipelineForm.View())
+	}
+	return styles.SectionContainer(false).
+		Width(m.width - 34).
+		Height(m.height - 3).
+		AlignHorizontal(lipgloss.Center).
+		AlignVertical(lipgloss.Center).
+		Render("Select an application")
 }
 
-var PipelineTableKeys = keyMap{
-	Enter: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("enter", "open"),
-	),
-	BuildDeploy: key.NewBinding(
-		key.WithKeys("ctrl+n"),
-		key.WithHelp("ctrl+n", "build-deploy"),
-	),
-	Refresh: key.NewBinding(
-		key.WithKeys("ctrl+r"),
-		key.WithHelp("ctrl+r", "refresh"),
-	),
-	Up: key.NewBinding(
-		key.WithKeys("up"),
-		key.WithHelp("up", "move up"),
-	),
-	Down: key.NewBinding(
-		key.WithKeys("down"),
-		key.WithHelp("down", "move down"),
-	),
-	Esc: key.NewBinding(
-		key.WithKeys("esc"),
-		key.WithHelp("esc", "back"),
-	),
-}
-
-var BuildDeployFormKeys = keyMap{
-	Esc: key.NewBinding(
-		key.WithKeys("esc"),
-		key.WithHelp("esc", "back"),
-	),
-	Refresh: key.NewBinding(
-		key.WithKeys("ctrl+r"),
-		key.WithHelp("ctrl+r", "refresh"),
-	),
+func (m Model) getEnvironemntTableView() string {
+	if m.focused == application {
+		return styles.SectionContainer(false).
+			Width(30).
+			Height(9).
+			AlignHorizontal(lipgloss.Center).
+			AlignVertical(lipgloss.Center).
+			Render("Select an application")
+	}
+	if m.isLoadingApplication {
+		return styles.SectionContainer(false).
+			Width(30).
+			Height(9).
+			AlignHorizontal(lipgloss.Center).
+			AlignVertical(lipgloss.Center).
+			Render("Loading application data " + m.spinner.View())
+	}
+	return styles.SectionContainer(false).
+		Render(m.enviromentTable.View())
 }
