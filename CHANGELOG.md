@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/FredrikMWold/radix-tui/compare/v1.6.0...v1.6.1) (2024-07-22)
+
+
+### Bug Fixes
+
+* extra comma in the config file causing app to crash ([82f0c3d](https://github.com/FredrikMWold/radix-tui/commit/82f0c3dcd6cd255219e1db0c240633ffa9e7916c))
+
 ## [1.6.0](https://github.com/FredrikMWold/radix-tui/compare/v1.5.0...v1.6.0) (2024-07-22)
 
 
