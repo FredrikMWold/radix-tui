@@ -1,4 +1,4 @@
-package pipelineform
+package buildanddeploy
 
 import (
 	"github.com/charmbracelet/huh"

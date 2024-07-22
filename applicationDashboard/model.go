@@ -4,7 +4,8 @@ import (
 	applicationtable "github.com/FredrikMWold/radix-tui/applicationTable"
 	"github.com/FredrikMWold/radix-tui/commands"
 	environmenttable "github.com/FredrikMWold/radix-tui/environmentTable"
-	pipelineform "github.com/FredrikMWold/radix-tui/pipelineForm"
+	applyconfig "github.com/FredrikMWold/radix-tui/pipelineForms/applyConfig"
+	buildanddeploy "github.com/FredrikMWold/radix-tui/pipelineForms/buildAndDeploy"
 	pipelinetable "github.com/FredrikMWold/radix-tui/pipelineTable"
 	"github.com/FredrikMWold/radix-tui/styles"
 	"github.com/charmbracelet/bubbles/help"
@@ -19,14 +20,16 @@ type Focused int
 const (
 	application Focused = iota
 	pipeline
-	form
+	buildAndDeploy
+	applyConfig
 )
 
 type Model struct {
 	applicationsTable    applicationtable.Model
 	pipelineTable        pipelinetable.Model
 	enviromentTable      tea.Model
-	pipelineForm         tea.Model
+	buildAndDeploy       tea.Model
+	applyConfig          tea.Model
 	spinner              spinner.Model
 	keys                 keyMap
 	help                 help.Model
@@ -43,7 +46,8 @@ func New() Model {
 	applicationTable := applicationtable.New()
 	pipelineTable := pipelinetable.New()
 	enviromentTable := environmenttable.New()
-	pipelineForm := pipelineform.New()
+	buildAndDeploy := buildanddeploy.New()
+	applyConfig := applyconfig.New()
 
 	spiner := spinner.New()
 	spiner.Spinner = spinner.Meter
@@ -53,7 +57,8 @@ func New() Model {
 		applicationsTable:    applicationTable,
 		pipelineTable:        pipelineTable,
 		enviromentTable:      enviromentTable,
-		pipelineForm:         pipelineForm,
+		buildAndDeploy:       buildAndDeploy,
+		applyConfig:          applyConfig,
 		help:                 help.New(),
 		spinner:              spiner,
 		focused:              application,
@@ -68,16 +73,17 @@ type keyMap struct {
 	Down        key.Binding
 	Esc         key.Binding
 	BuildDeploy key.Binding
+	ApplyConfig key.Binding
 	Refresh     key.Binding
 }
 
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Enter, k.BuildDeploy, k.Refresh, k.Up, k.Down, k.Esc}
+	return []key.Binding{k.Enter, k.BuildDeploy, k.ApplyConfig, k.Refresh, k.Up, k.Down, k.Esc}
 }
 
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Enter, k.BuildDeploy, k.Refresh, k.Up, k.Down, k.Esc},
+		{k.Enter, k.BuildDeploy, k.ApplyConfig, k.Refresh, k.Up, k.Down, k.Esc},
 	}
 }
 
@@ -94,11 +100,17 @@ func (m Model) getActivePageView() string {
 		return styles.SectionContainer(true).
 			Render(m.pipelineTable.View())
 	}
-	if m.focused == form {
+	if m.focused == buildAndDeploy {
 		return styles.SectionContainer(true).
 			Width(m.width - 34).
 			Height(m.height - 3).
-			Render(m.pipelineForm.View())
+			Render(m.buildAndDeploy.View())
+	}
+	if m.focused == applyConfig {
+		return styles.SectionContainer(true).
+			Width(m.width - 34).
+			Height(m.height - 3).
+			Render(m.applyConfig.View())
 	}
 	return styles.SectionContainer(false).
 		Width(m.width - 34).

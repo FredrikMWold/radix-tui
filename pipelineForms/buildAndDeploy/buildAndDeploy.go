@@ -1,4 +1,4 @@
-package pipelineform
+package buildanddeploy
 
 import (
 	"github.com/FredrikMWold/radix-tui/commands"
@@ -16,7 +16,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.form.WithWidth(msg.Width - 12)
 		m.width = msg.Width
 	case commands.Application:
 		var options []string
@@ -35,7 +34,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					Title("Environment").
 					Description("Select the environment you want to deploy to").
 					WithTheme(huh.ThemeCatppuccin()),
-			).WithWidth(m.width),
+			),
 		)
 		m.SelectedApplication = msg.Name
 		return m, m.form.Init()
@@ -55,6 +54,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	var formHeader = lipgloss.NewStyle().Padding(0, 0, 1, 0).Bold(true).Render("Build and deploy")
-	return lipgloss.JoinVertical(lipgloss.Left, lipgloss.PlaceHorizontal(m.width-34, lipgloss.Center, formHeader), m.form.View())
+	formHeader := lipgloss.NewStyle().Padding(0, 0, 2, 0).Bold(true).Render("Build and deploy")
+	form := lipgloss.NewStyle().Render(m.form.View())
+	return lipgloss.PlaceHorizontal(m.width-34, lipgloss.Center, formHeader+"\n"+form)
 }

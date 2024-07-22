@@ -26,6 +26,10 @@ var PipelineTableKeys = keyMap{
 		key.WithKeys("ctrl+n"),
 		key.WithHelp("ctrl+n", "build-deploy"),
 	),
+	ApplyConfig: key.NewBinding(
+		key.WithKeys("ctrl+a"),
+		key.WithHelp("ctrl+a", "apply-config"),
+	),
 	Refresh: key.NewBinding(
 		key.WithKeys("ctrl+r"),
 		key.WithHelp("ctrl+r", "refresh"),

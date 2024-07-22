@@ -12,7 +12,8 @@ func (m Model) Init() tea.Cmd {
 		m.applicationsTable.Init(),
 		m.pipelineTable.Init(),
 		m.enviromentTable.Init(),
-		m.pipelineForm.Init(),
+		m.buildAndDeploy.Init(),
+		m.applyConfig.Init(),
 		commands.GetApplications,
 		m.spinner.Tick,
 	)
@@ -34,7 +35,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "ctrl+n":
 			if m.focused == pipeline {
-				m.focused = form
+				m.focused = buildAndDeploy
+				m.keys = BuildDeployFormKeys
+			}
+		case "ctrl+a":
+			if m.focused == pipeline {
+				m.focused = applyConfig
 				m.keys = BuildDeployFormKeys
 			}
 		case "esc":
@@ -58,7 +64,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, commands.GetApplicationData(string(msg))
 
 	case tea.WindowSizeMsg, commands.Application:
-		var appCmds, pipeCmds, envCmds, formCmds tea.Cmd
+		var appCmds, pipeCmds, envCmds, bndCmds, applyCmds tea.Cmd
 		if _, ok := msg.(commands.Application); ok {
 			m.isLoadingApplication = false
 			m.application = msg.(commands.Application)
@@ -71,13 +77,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.applicationsTable, appCmds = m.applicationsTable.Update(msg)
 		m.pipelineTable, pipeCmds = m.pipelineTable.Update(msg)
 		m.enviromentTable, envCmds = m.enviromentTable.Update(msg)
-		m.pipelineForm, formCmds = m.pipelineForm.Update(msg)
-		cmds = append(cmds, appCmds, pipeCmds, envCmds, formCmds)
+		m.buildAndDeploy, bndCmds = m.buildAndDeploy.Update(msg)
+		m.applyConfig, applyCmds = m.applyConfig.Update(msg)
+		cmds = append(cmds, appCmds, pipeCmds, envCmds, bndCmds, applyCmds)
 	}
 
-	if m.focused == form {
+	if m.focused == buildAndDeploy {
 		var formCmd tea.Cmd
-		m.pipelineForm, formCmd = m.pipelineForm.Update(msg)
+		m.buildAndDeploy, formCmd = m.buildAndDeploy.Update(msg)
 		cmds = append(cmds, formCmd)
 	}
 
@@ -91,6 +98,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		var pipelineTableCmd tea.Cmd
 		m.pipelineTable, pipelineTableCmd = m.pipelineTable.Update(msg)
 		cmds = append(cmds, pipelineTableCmd)
+	}
+
+	if m.focused == applyConfig {
+		var applyConfigCmd tea.Cmd
+		m.applyConfig, applyConfigCmd = m.applyConfig.Update(msg)
+		cmds = append(cmds, applyConfigCmd)
 	}
 
 	var spinnerCmd tea.Cmd
