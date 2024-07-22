@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/FredrikMWold/radix-tui/compare/v1.5.0...v1.6.0) (2024-07-22)
+
+
+### Features
+
+* adds ability to create apply-config pipeline ([99e978a](https://github.com/FredrikMWold/radix-tui/commit/99e978a7dc1336c1f4812309b291be450f574429))
+
 ## [1.5.0](https://github.com/FredrikMWold/radix-tui/compare/v1.4.0...v1.5.0) (2024-07-18)
 
 
