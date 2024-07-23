@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/FredrikMWold/radix-tui/commands"
+	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
 	"github.com/FredrikMWold/radix-tui/styles"
 	"github.com/charmbracelet/bubbles/table"
 )

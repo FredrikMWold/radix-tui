@@ -15,8 +15,9 @@ func NewForm() *huh.Form {
 		huh.NewGroup(
 			huh.NewConfirm().
 				Key("applyConfig").
-				Affirmative("Create job").
+				Affirmative("Create").
 				Negative("Cancel").
+				Title("Create apply config job").
 				WithTheme(huh.ThemeCatppuccin()),
 		),
 	)

@@ -1,7 +1,7 @@
 package applyconfig
 
 import (
-	"github.com/FredrikMWold/radix-tui/commands"
+	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
@@ -19,12 +19,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 	case commands.Application:
 		m.selectedApplication = msg.Name
-		m.form = NewForm().WithWidth(30)
+		m.form = NewForm()
 	}
 
-	if m.form.State == huh.StateCompleted {
+	if m.form.State == huh.StateCompleted && m.form.GetBool("applyConfig") {
 		m.form.State = huh.StateAborted
-		return m, commands.ApplyConfig(m.selectedApplication)
+		return m, ApplyConfig(m.selectedApplication)
 	}
 
 	form, cmd := m.form.Update(msg)
@@ -37,6 +37,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	formHeader := lipgloss.NewStyle().Padding(0, 0, 2, 0).Bold(true).Render("Apply config")
-	form := lipgloss.NewStyle().Render(m.form.View())
+	form := lipgloss.NewStyle().MaxWidth(26).Render(m.form.View())
 	return lipgloss.PlaceHorizontal(m.width-34, lipgloss.Center, formHeader+"\n"+form)
 }

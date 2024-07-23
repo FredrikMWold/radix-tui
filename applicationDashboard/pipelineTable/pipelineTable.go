@@ -1,7 +1,7 @@
 package pipelinetable
 
 import (
-	"github.com/FredrikMWold/radix-tui/commands"
+	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"

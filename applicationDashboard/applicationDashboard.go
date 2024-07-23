@@ -1,7 +1,7 @@
 package appllicationdashboard
 
 import (
-	"github.com/FredrikMWold/radix-tui/commands"
+	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
 	"github.com/FredrikMWold/radix-tui/styles"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -12,10 +12,9 @@ func (m Model) Init() tea.Cmd {
 		m.applicationsTable.Init(),
 		m.pipelineTable.Init(),
 		m.enviromentTable.Init(),
-		m.buildAndDeploy.Init(),
-		m.applyConfig.Init(),
 		commands.GetApplications,
 		m.spinner.Tick,
+		getContext,
 	)
 }
 
@@ -57,6 +56,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case commands.Applications:
 		m.applications = msg
 
+	case Context:
+		m.context = string(msg)
 	case commands.SelectedApplication:
 		m.isLoadingApplication = true
 		m.focused = pipeline
@@ -64,7 +65,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, commands.GetApplicationData(string(msg))
 
 	case tea.WindowSizeMsg, commands.Application:
-		var appCmds, pipeCmds, envCmds, bndCmds, applyCmds tea.Cmd
 		if _, ok := msg.(commands.Application); ok {
 			m.isLoadingApplication = false
 			m.application = msg.(commands.Application)
@@ -74,37 +74,28 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.width = msg.(tea.WindowSizeMsg).Width
 			m.help.Width = msg.(tea.WindowSizeMsg).Width
 		}
-		m.applicationsTable, appCmds = m.applicationsTable.Update(msg)
-		m.pipelineTable, pipeCmds = m.pipelineTable.Update(msg)
-		m.enviromentTable, envCmds = m.enviromentTable.Update(msg)
-		m.buildAndDeploy, bndCmds = m.buildAndDeploy.Update(msg)
-		m.applyConfig, applyCmds = m.applyConfig.Update(msg)
-		cmds = append(cmds, appCmds, pipeCmds, envCmds, bndCmds, applyCmds)
+
+		m.applicationsTable, _ = m.applicationsTable.Update(msg)
+		m.pipelineTable, _ = m.pipelineTable.Update(msg)
+		m.enviromentTable, _ = m.enviromentTable.Update(msg)
+		m.buildAndDeploy, _ = m.buildAndDeploy.Update(msg)
+		m.applyConfig, _ = m.applyConfig.Update(msg)
 	}
 
+	var pageCmd tea.Cmd
 	if m.focused == buildAndDeploy {
-		var formCmd tea.Cmd
-		m.buildAndDeploy, formCmd = m.buildAndDeploy.Update(msg)
-		cmds = append(cmds, formCmd)
+		m.buildAndDeploy, pageCmd = m.buildAndDeploy.Update(msg)
 	}
-
 	if m.focused == application {
-		var applicationsTableCmd tea.Cmd
-		m.applicationsTable, applicationsTableCmd = m.applicationsTable.Update(msg)
-		cmds = append(cmds, applicationsTableCmd)
+		m.applicationsTable, pageCmd = m.applicationsTable.Update(msg)
 	}
-
 	if m.focused == pipeline {
-		var pipelineTableCmd tea.Cmd
-		m.pipelineTable, pipelineTableCmd = m.pipelineTable.Update(msg)
-		cmds = append(cmds, pipelineTableCmd)
+		m.pipelineTable, pageCmd = m.pipelineTable.Update(msg)
 	}
-
 	if m.focused == applyConfig {
-		var applyConfigCmd tea.Cmd
-		m.applyConfig, applyConfigCmd = m.applyConfig.Update(msg)
-		cmds = append(cmds, applyConfigCmd)
+		m.applyConfig, pageCmd = m.applyConfig.Update(msg)
 	}
+	cmds = append(cmds, pageCmd)
 
 	var spinnerCmd tea.Cmd
 	m.spinner, spinnerCmd = m.spinner.Update(msg)
@@ -114,6 +105,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
+	if m.width <= 110 || m.height <= 25 {
+		return lipgloss.NewStyle().
+			Height(m.height).
+			Width(m.width).
+			AlignHorizontal(lipgloss.Center).
+			AlignVertical(lipgloss.Center).
+			Render(
+				lipgloss.JoinVertical(
+					lipgloss.Center,
+					"Terminal window is too small \n",
+					"Please resize the terminal window to at least 110x25"),
+			)
+
+	}
 	if len(m.applications) == 0 {
 		return lipgloss.NewStyle().
 			Height(m.height).
@@ -128,6 +133,7 @@ func (m Model) View() string {
 			lipgloss.Top,
 			styles.SectionContainer(m.focused == application).Render(m.applicationsTable.View()),
 			m.getEnvironemntTableView(),
+			styles.SectionContainer(false).Width(30).Align(lipgloss.Center).Render("Context: "+m.context),
 		),
 		m.getActivePageView(),
 	) + "\n" + m.help.View(m.keys)

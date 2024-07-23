@@ -1,12 +1,12 @@
 package appllicationdashboard
 
 import (
-	applicationtable "github.com/FredrikMWold/radix-tui/applicationTable"
-	"github.com/FredrikMWold/radix-tui/commands"
-	environmenttable "github.com/FredrikMWold/radix-tui/environmentTable"
-	applyconfig "github.com/FredrikMWold/radix-tui/pipelineForms/applyConfig"
-	buildanddeploy "github.com/FredrikMWold/radix-tui/pipelineForms/buildAndDeploy"
-	pipelinetable "github.com/FredrikMWold/radix-tui/pipelineTable"
+	applicationtable "github.com/FredrikMWold/radix-tui/applicationDashboard/applicationTable"
+	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
+	environmenttable "github.com/FredrikMWold/radix-tui/applicationDashboard/environmentTable"
+	applyconfig "github.com/FredrikMWold/radix-tui/applicationDashboard/pipelineForms/applyConfig"
+	buildanddeploy "github.com/FredrikMWold/radix-tui/applicationDashboard/pipelineForms/buildAndDeploy"
+	pipelinetable "github.com/FredrikMWold/radix-tui/applicationDashboard/pipelineTable"
 	"github.com/FredrikMWold/radix-tui/styles"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -33,6 +33,7 @@ type Model struct {
 	spinner              spinner.Model
 	keys                 keyMap
 	help                 help.Model
+	context              string
 	application          commands.Application
 	focused              Focused
 	isLoadingApplication bool

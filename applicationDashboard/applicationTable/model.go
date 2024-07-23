@@ -14,7 +14,6 @@ func New() Model {
 		table: table.New(
 			table.WithColumns(applicationColumns),
 			table.WithFocused(true),
-			table.WithHeight(8),
 			table.WithStyles(styles.TableStyles()),
 		),
 		isLoadingApplications: true,

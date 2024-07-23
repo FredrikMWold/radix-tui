@@ -1,7 +1,7 @@
 package applicationtable
 
 import (
-	"github.com/FredrikMWold/radix-tui/commands"
+	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -18,11 +18,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		switch msg.String() {
 		case "enter":
 			if len(m.table.SelectedRow()) > 0 {
-				return m, selectApplication(m.table.SelectedRow()[0])
+				return m, commands.SelectApplication(m.table.SelectedRow()[0])
 			}
 		}
 	case tea.WindowSizeMsg:
-		m.table.SetHeight(msg.Height - 18)
+		m.table.SetHeight(msg.Height - 21)
 
 	case commands.Applications:
 		m.isLoadingApplications = false

@@ -9,8 +9,15 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type Applications []string
 type SelectedApplication string
+
+func SelectApplication(application string) tea.Cmd {
+	return func() tea.Msg {
+		return SelectedApplication(application)
+	}
+}
+
+type Applications []string
 
 func GetApplications() tea.Msg {
 	result := exec.Command("rx", "get", "application")
@@ -24,47 +31,6 @@ func GetApplications() tea.Msg {
 		application_list = GetApplications().(Applications)
 	}
 	return Applications(application_list)
-}
-
-type CreatedPipelineJob string
-
-func BuildAndDeploy(application string, branch string) tea.Cmd {
-	return func() tea.Msg {
-		result := exec.Command("rx", "create", "pipeline-job", "build-deploy", "-a", application, "-b", branch)
-		_, err := result.Output()
-		if err != nil {
-			fmt.Println(err)
-		}
-		return SelectedApplication(application)
-	}
-}
-
-func ApplyConfig(application string) tea.Cmd {
-	return func() tea.Msg {
-		result := exec.Command("rx", "create", "pipeline-job", "apply-config", "-a", application)
-		_, err := result.Output()
-		if err != nil {
-			fmt.Println(err)
-		}
-		return SelectedApplication(application)
-	}
-
-}
-
-func GetApplicationData(application string) tea.Cmd {
-	return func() tea.Msg {
-		result := exec.Command("rx", "get", "application", "-a", application)
-		output, err := result.Output()
-		if err != nil {
-			fmt.Println(err)
-		}
-		var application Application
-		err = json.Unmarshal(output, &application)
-		if err != nil {
-			fmt.Println(err)
-		}
-		return application
-	}
 }
 
 type Application struct {
@@ -86,4 +52,20 @@ type Environment struct {
 	BranchMapping string `json:"branchMapping"`
 	Name          string `json:"name"`
 	Status        string `json:"status"`
+}
+
+func GetApplicationData(application string) tea.Cmd {
+	return func() tea.Msg {
+		result := exec.Command("rx", "get", "application", "-a", application)
+		output, err := result.Output()
+		if err != nil {
+			fmt.Println(err)
+		}
+		var application Application
+		err = json.Unmarshal(output, &application)
+		if err != nil {
+			fmt.Println(err)
+		}
+		return application
+	}
 }
