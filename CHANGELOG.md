@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.7.0](https://github.com/FredrikMWold/radix-tui/compare/v1.6.1...v1.7.0) (2024-07-23)
+
+
+### Features
+
+* adds error screen when terminal is to small ([15fdbca](https://github.com/FredrikMWold/radix-tui/commit/15fdbca25299fe5db215f084d8b8e69124aeeedf))
+* show which context the radix cli is using ([15fdbca](https://github.com/FredrikMWold/radix-tui/commit/15fdbca25299fe5db215f084d8b8e69124aeeedf))
+
 ## [1.6.1](https://github.com/FredrikMWold/radix-tui/compare/v1.6.0...v1.6.1) (2024-07-22)
 
 
