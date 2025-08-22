@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.8.0](https://github.com/FredrikMWold/radix-tui/compare/v1.7.0...v1.8.0) (2025-08-22)
+
+
+### Features
+
+* adds polling off pipeline jobs ([8df5847](https://github.com/FredrikMWold/radix-tui/commit/8df584763a28eb8746a6c112182661b37983dd62))
+* cache list of application ([63bbd30](https://github.com/FredrikMWold/radix-tui/commit/63bbd303af483e9010ab806fcba8b5c1ac31f1fe))
+
+
+### Bug Fixes
+
+* imporve login flow ([2a07116](https://github.com/FredrikMWold/radix-tui/commit/2a07116cac7493c43a9a7f605a9074e2ad8cec12))
+* show correct timezone ([8e1a727](https://github.com/FredrikMWold/radix-tui/commit/8e1a727c005a8b1e1cfc0468a7fc284ccc6a2075))
+
 ## [1.7.0](https://github.com/FredrikMWold/radix-tui/compare/v1.6.1...v1.7.0) (2024-07-23)
 
 
