@@ -20,15 +20,45 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.openJobInBrowser()
 		}
 	case tea.WindowSizeMsg:
-		var columns = []table.Column{
-			{Title: "Triggered by", Width: (msg.Width - 44) / 5},
-			{Title: "Environment", Width: (msg.Width - 44) / 5},
-			{Title: "Pipeline", Width: (msg.Width - 44) / 5},
-			{Title: "Status", Width: (msg.Width - 44) / 5},
-			{Title: "Created", Width: (msg.Width - 44) / 5},
-		}
+		// Compute right-pane width and distribute across columns to fill fully
+		w := msg.Width - 34
 		m.table.SetHeight(msg.Height - 7)
-		m.table.SetWidth(msg.Width - 34)
+		m.table.SetWidth(w)
+		// Bubble table adds cell padding (default is 1 left + 1 right per column)
+		const cols = 5
+		const cellPad = 2 // total horizontal padding per cell (left+right)
+		contentW := w - (cols * cellPad)
+		if contentW < cols { // ensure non-negative widths
+			contentW = cols
+		}
+		// Proportional widths based on content width; last column takes remainder
+		w1 := contentW * 2 / 7               // Triggered by
+		w2 := contentW * 1 / 7               // Environment
+		w3 := contentW * 1 / 7               // pipeline
+		w4 := contentW * 1 / 7               // status
+		w5 := contentW - (w1 + w2 + w3 + w4) // created gets the rest
+		if w1 < 1 {
+			w1 = 1
+		}
+		if w2 < 1 {
+			w2 = 1
+		}
+		if w3 < 1 {
+			w3 = 1
+		}
+		if w4 < 1 {
+			w4 = 1
+		}
+		if w5 < 1 {
+			w5 = 1
+		}
+		var columns = []table.Column{
+			{Title: "Triggered by", Width: w1},
+			{Title: "Environment", Width: w2},
+			{Title: "pipeline", Width: w3},
+			{Title: "status", Width: w4},
+			{Title: "created", Width: w5},
+		}
 		m.table.SetColumns(columns)
 
 	case commands.Application:
@@ -74,12 +104,17 @@ func (m Model) View() string {
 	titleText := lipgloss.NewStyle().Bold(true).Render("Pipeline jobs")
 	spin := ""
 	if m.refreshing {
-		spin = m.spinner.View()
+		spin = " " + m.spinner.View()
 	}
-	// Reserve two columns for spinner output so the title width stays constant
-	spinBox := lipgloss.NewStyle().Width(3).Render(spin)
-	header := lipgloss.JoinHorizontal(lipgloss.Left, titleText, " ", spinBox)
-	return lipgloss.JoinVertical(lipgloss.Center, header, m.table.View())
+	// Reserve a wider spinner slot so centering is stable across frames
+	spinBox := lipgloss.NewStyle().Width(4).Render(spin)
+	headerLine := lipgloss.JoinHorizontal(lipgloss.Left, titleText, spinBox)
+	// Make header exactly as wide as the table and center the content for symmetric padding
+	header := lipgloss.NewStyle().
+		Width(lipgloss.Width(m.table.View())).
+		AlignHorizontal(lipgloss.Center).
+		Render(headerLine)
+	return lipgloss.JoinVertical(lipgloss.Left, header, m.table.View())
 }
 
 // pollTick is an internal message used to schedule periodic refreshes.
