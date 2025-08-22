@@ -23,9 +23,9 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		var columns = []table.Column{
 			{Title: "Triggered by", Width: (msg.Width - 44) / 5},
 			{Title: "Environment", Width: (msg.Width - 44) / 5},
-			{Title: "pipeline", Width: (msg.Width - 44) / 5},
-			{Title: "status", Width: (msg.Width - 44) / 5},
-			{Title: "created", Width: (msg.Width - 44) / 5},
+			{Title: "Pipeline", Width: (msg.Width - 44) / 5},
+			{Title: "Status", Width: (msg.Width - 44) / 5},
+			{Title: "Created", Width: (msg.Width - 44) / 5},
 		}
 		m.table.SetHeight(msg.Height - 7)
 		m.table.SetWidth(msg.Width - 34)

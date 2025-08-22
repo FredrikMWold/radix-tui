@@ -39,11 +39,10 @@ func (m *Model) loadApplication(application commands.Application) {
 	m.refreshing = false
 	rows := make([]table.Row, len(application.Jobs))
 	for i, job := range application.Jobs {
-		parsedTime, err := time.Parse(time.RFC3339, job.Created)
-		if err != nil {
-			fmt.Println(err)
+		if t, ok := parseCreated(job.Created); ok {
+			// Render in local time to avoid confusion with UTC offsets
+			job.Created = t.In(time.Local).Format("02.01.2006 15:04:05")
 		}
-		job.Created = parsedTime.Format("02.01.2006 15:04:05")
 		environment := "No environment"
 		if len(job.Environments) > 0 {
 			environment = job.Environments[0]
@@ -51,6 +50,26 @@ func (m *Model) loadApplication(application commands.Application) {
 		rows[i] = table.Row([]string{job.TriggeredBy, environment, job.Pipeline, job.Status, job.Created})
 	}
 	m.table.SetRows(rows)
+}
+
+// parseCreated tries common layouts from the API and returns a parsed time if successful.
+func parseCreated(s string) (time.Time, bool) {
+	layouts := []string{
+		time.RFC3339Nano,
+		time.RFC3339,
+		// Additional explicit forms sometimes used by generators
+		"2006-01-02T15:04:05.999999999Z07:00",
+		"2006-01-02T15:04:05.999999Z07:00",
+		"2006-01-02T15:04:05Z07:00",
+	}
+	for _, layout := range layouts {
+		if t, err := time.Parse(layout, s); err == nil {
+			return t, true
+		}
+	}
+	// Keep original string on failure to avoid showing year 0001
+	fmt.Println("failed to parse job.Created:", s)
+	return time.Time{}, false
 }
 
 func (m Model) openJobInBrowser() {
