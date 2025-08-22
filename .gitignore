@@ -1,0 +1,15 @@
+# Go build artifacts
+radix-tui
+*.exe
+*.test
+*.out
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Vendor
+/vendor/

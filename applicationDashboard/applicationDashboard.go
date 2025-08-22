@@ -13,6 +13,8 @@ func (m Model) Init() tea.Cmd {
 		m.pipelineTable.Init(),
 		m.enviromentTable.Init(),
 		commands.CheckAuth(),
+		// Emit cached applications immediately if available for fast startup
+		commands.LoadCachedApplications(),
 		m.spinner.Tick, // spinner will be visible only when we choose to render it
 		getContext,
 	)

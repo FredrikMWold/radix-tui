@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sort"
 	"time"
@@ -60,6 +61,30 @@ func LoginInteractive() tea.Cmd {
 	}
 }
 
+// LoadCachedApplications emits Applications from disk cache (if present) for the current context.
+// This lets the UI start fast without waiting for network or auth.
+func LoadCachedApplications() tea.Cmd {
+	return func() tea.Msg {
+		// Determine current context (same as getContext)
+		cfg, err := radixconfig.GetRadixConfig()
+		var ctxName string
+		if err == nil && cfg != nil && cfg.CustomConfig != nil {
+			ctxName = cfg.CustomConfig.Context
+		}
+		cacheFile := fmt.Sprintf("%s/radix-tui-cache.json", radixconfig.RadixConfigDir)
+		c := cache.New(cacheFile, "applications")
+		key := fmt.Sprintf("apps_%s", ctxName)
+		if raw, ok := c.GetItem(key); ok && len(raw) > 0 {
+			var apps []string
+			if err := json.Unmarshal([]byte(raw), &apps); err == nil && len(apps) > 0 {
+				sort.Strings(apps)
+				return Applications(apps)
+			}
+		}
+		return nil
+	}
+}
+
 func GetApplications() tea.Msg {
 	ctx := context.Background()
 	client, err := radix.New(false)
@@ -73,6 +98,22 @@ func GetApplications() tea.Msg {
 		return Applications{}
 	}
 	sort.Strings(apps)
+	// Persist to cache for fast next startup
+	func() {
+		// Determine current context
+		cfg, err := radixconfig.GetRadixConfig()
+		var ctxName string
+		if err == nil && cfg != nil && cfg.CustomConfig != nil {
+			ctxName = cfg.CustomConfig.Context
+		}
+		cacheFile := fmt.Sprintf("%s/radix-tui-cache.json", radixconfig.RadixConfigDir)
+		c := cache.New(cacheFile, "applications")
+		key := fmt.Sprintf("apps_%s", ctxName)
+		if b, err := json.Marshal(apps); err == nil {
+			// Keep for 7 days; we'll always refresh on startup anyway
+			c.SetItem(key, string(b), 7*24*time.Hour)
+		}
+	}()
 	return Applications(apps)
 }
 
