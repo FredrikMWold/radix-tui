@@ -8,25 +8,35 @@ import (
 
 	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
 	"github.com/FredrikMWold/radix-tui/styles"
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/table"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func New() Model {
+	sp := spinner.New()
+	sp.Spinner = spinner.Meter
+	sp.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
 	return Model{
 		table: table.New(
 			table.WithFocused(true),
 			table.WithStyles(styles.TableStyles()),
 		),
+		spinner: sp,
 	}
 }
 
 type Model struct {
 	table       table.Model
 	application commands.Application
+	spinner     spinner.Model
+	refreshing  bool
+	pollSeq     int
 }
 
 func (m *Model) loadApplication(application commands.Application) {
 	m.application = application
+	m.refreshing = false
 	rows := make([]table.Row, len(application.Jobs))
 	for i, job := range application.Jobs {
 		parsedTime, err := time.Parse(time.RFC3339, job.Created)
