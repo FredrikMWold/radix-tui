@@ -3,6 +3,7 @@ package pipelinetable
 import (
 	"fmt"
 	"os/exec"
+	"runtime"
 	"time"
 
 	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
@@ -48,5 +49,14 @@ func (m Model) openJobInBrowser() {
 	}
 	tableCursor := m.table.Cursor()
 	url := fmt.Sprintf("https://console.radix.equinor.com/applications/%s/jobs/view/%s", m.application.Name, m.application.Jobs[tableCursor].Name)
-	exec.Command("open", url).Start()
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", url)
+	case "windows":
+		cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
+	default:
+		cmd = exec.Command("xdg-open", url)
+	}
+	_ = cmd.Start()
 }

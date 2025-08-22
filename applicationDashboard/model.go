@@ -40,6 +40,7 @@ type Model struct {
 	height               int
 	width                int
 	applications         []string
+	hasAuthRedirect      bool
 }
 
 func New() Model {

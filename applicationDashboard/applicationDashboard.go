@@ -12,8 +12,8 @@ func (m Model) Init() tea.Cmd {
 		m.applicationsTable.Init(),
 		m.pipelineTable.Init(),
 		m.enviromentTable.Init(),
-		commands.GetApplications,
-		m.spinner.Tick,
+		commands.CheckAuth(),
+		m.spinner.Tick, // spinner will be visible only when we choose to render it
 		getContext,
 	)
 }
@@ -22,6 +22,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 
 	switch msg := msg.(type) {
+	case commands.AuthWaiting:
+		// Show waiting for auth (no spinner), and trigger interactive login
+		m.hasAuthRedirect = true
+		return m, commands.LoginInteractive()
+
+	case commands.LoggedIn, commands.AuthOK:
+		// After login or when already authenticated, start loading applications
+		m.hasAuthRedirect = false
+		return m, commands.GetApplications
 
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -54,7 +63,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case commands.Applications:
+		// Loaded apps → clear any implicit auth-waiting state
 		m.applications = msg
+		m.hasAuthRedirect = false
 
 	case Context:
 		m.context = string(msg)
@@ -105,6 +116,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
+	// Before we get the first WindowSizeMsg, width/height can be 0; render a minimal view instead of blank.
+	if m.width == 0 || m.height == 0 {
+		if m.hasAuthRedirect {
+			return "Waiting for authentication"
+		}
+		return "Loading applications " + m.spinner.View()
+	}
 	if m.width <= 110 || m.height <= 25 {
 		return lipgloss.NewStyle().
 			Height(m.height).
@@ -120,6 +138,16 @@ func (m Model) View() string {
 
 	}
 	if len(m.applications) == 0 {
+		if m.hasAuthRedirect {
+			// During redirect, show text without spinner
+			return lipgloss.NewStyle().
+				Height(m.height).
+				Width(m.width).
+				AlignHorizontal(lipgloss.Center).
+				AlignVertical(lipgloss.Center).
+				Render("Waiting for authentication")
+		}
+		// Otherwise, show normal loading with spinner
 		return lipgloss.NewStyle().
 			Height(m.height).
 			Width(m.width).
