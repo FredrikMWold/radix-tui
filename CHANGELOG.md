@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/FredrikMWold/radix-tui/compare/v1.8.0...v1.9.0) (2025-12-15)
+
+
+### Features
+
+* Add context switcher to application dashboard ([b19034b](https://github.com/FredrikMWold/radix-tui/commit/b19034b1c19979b98fdbcb4ac3e0465a4c1a3244))
+
 ## [1.8.0](https://github.com/FredrikMWold/radix-tui/compare/v1.7.0...v1.8.0) (2025-08-22)
 
 
