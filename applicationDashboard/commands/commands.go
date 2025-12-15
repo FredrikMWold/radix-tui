@@ -21,7 +21,17 @@ func SelectApplication(application string) tea.Cmd {
 	}
 }
 
-type Applications []string
+// Applications contains loaded apps and the context they were loaded for
+type Applications struct {
+	Apps    []string
+	Context string
+}
+
+// ApplicationsError is sent when loading applications fails
+type ApplicationsError struct {
+	Err     error
+	Context string
+}
 
 // AuthWaiting indicates we expect to perform interactive login.
 type AuthWaiting struct{}
@@ -78,7 +88,7 @@ func LoadCachedApplications() tea.Cmd {
 			var apps []string
 			if err := json.Unmarshal([]byte(raw), &apps); err == nil && len(apps) > 0 {
 				sort.Strings(apps)
-				return Applications(apps)
+				return Applications{Apps: apps, Context: ctxName}
 			}
 		}
 		return nil
@@ -86,26 +96,25 @@ func LoadCachedApplications() tea.Cmd {
 }
 
 func GetApplications() tea.Msg {
+	// Get current context for error reporting
+	cfg, _ := radixconfig.GetRadixConfig()
+	var ctxName string
+	if cfg != nil && cfg.CustomConfig != nil {
+		ctxName = cfg.CustomConfig.Context
+	}
+
 	ctx := context.Background()
 	client, err := radix.New(false)
 	if err != nil {
-		fmt.Println(err)
-		return Applications{}
+		return ApplicationsError{Err: err, Context: ctxName}
 	}
 	apps, err := client.ListApplications(ctx)
 	if err != nil {
-		fmt.Println(err)
-		return Applications{}
+		return ApplicationsError{Err: err, Context: ctxName}
 	}
 	sort.Strings(apps)
 	// Persist to cache for fast next startup
 	func() {
-		// Determine current context
-		cfg, err := radixconfig.GetRadixConfig()
-		var ctxName string
-		if err == nil && cfg != nil && cfg.CustomConfig != nil {
-			ctxName = cfg.CustomConfig.Context
-		}
 		cacheFile := fmt.Sprintf("%s/radix-tui-cache.json", radixconfig.RadixConfigDir)
 		c := cache.New(cacheFile, "applications")
 		key := fmt.Sprintf("apps_%s", ctxName)
@@ -114,7 +123,7 @@ func GetApplications() tea.Msg {
 			c.SetItem(key, string(b), 7*24*time.Hour)
 		}
 	}()
-	return Applications(apps)
+	return Applications{Apps: apps, Context: ctxName}
 }
 
 type Application struct {
@@ -199,4 +208,25 @@ func stringDeref(p *string) string {
 		return ""
 	}
 	return *p
+}
+
+// ContextChanged is sent when the context is successfully changed
+type ContextChanged string
+
+// SetContext changes the radix context and saves it to config
+func SetContext(ctx string) tea.Cmd {
+	return func() tea.Msg {
+		if !radixconfig.IsValidContext(ctx) {
+			return nil
+		}
+		radixConfig, err := radixconfig.GetRadixConfig()
+		if err != nil {
+			return nil
+		}
+		radixConfig.CustomConfig.Context = ctx
+		if err := radixconfig.Save(radixConfig); err != nil {
+			return nil
+		}
+		return ContextChanged(ctx)
+	}
 }

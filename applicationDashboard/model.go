@@ -3,6 +3,7 @@ package appllicationdashboard
 import (
 	applicationtable "github.com/FredrikMWold/radix-tui/applicationDashboard/applicationTable"
 	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
+	contextswitcher "github.com/FredrikMWold/radix-tui/applicationDashboard/contextSwitcher"
 	environmenttable "github.com/FredrikMWold/radix-tui/applicationDashboard/environmentTable"
 	applyconfig "github.com/FredrikMWold/radix-tui/applicationDashboard/pipelineForms/applyConfig"
 	buildanddeploy "github.com/FredrikMWold/radix-tui/applicationDashboard/pipelineForms/buildAndDeploy"
@@ -22,6 +23,7 @@ const (
 	pipeline
 	buildAndDeploy
 	applyConfig
+	contextSwitch
 )
 
 type Model struct {
@@ -30,17 +32,21 @@ type Model struct {
 	enviromentTable      tea.Model
 	buildAndDeploy       tea.Model
 	applyConfig          tea.Model
+	contextSwitcher      contextswitcher.Model
 	spinner              spinner.Model
 	keys                 keyMap
 	help                 help.Model
 	context              string
 	application          commands.Application
 	focused              Focused
+	previousFocused      Focused
 	isLoadingApplication bool
 	height               int
 	width                int
 	applications         []string
 	hasAuthRedirect      bool
+	loadError            string
+	appsLoaded           bool
 }
 
 func New() Model {
@@ -70,22 +76,23 @@ func New() Model {
 }
 
 type keyMap struct {
-	Enter       key.Binding
-	Up          key.Binding
-	Down        key.Binding
-	Esc         key.Binding
-	BuildDeploy key.Binding
-	ApplyConfig key.Binding
-	Refresh     key.Binding
+	Enter         key.Binding
+	Up            key.Binding
+	Down          key.Binding
+	Esc           key.Binding
+	BuildDeploy   key.Binding
+	ApplyConfig   key.Binding
+	Refresh       key.Binding
+	SwitchContext key.Binding
 }
 
 func (k keyMap) ShortHelp() []key.Binding {
-	return []key.Binding{k.Enter, k.BuildDeploy, k.ApplyConfig, k.Refresh, k.Up, k.Down, k.Esc}
+	return []key.Binding{k.Enter, k.BuildDeploy, k.ApplyConfig, k.Refresh, k.SwitchContext, k.Up, k.Down, k.Esc}
 }
 
 func (k keyMap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Enter, k.BuildDeploy, k.ApplyConfig, k.Refresh, k.Up, k.Down, k.Esc},
+		{k.Enter, k.BuildDeploy, k.ApplyConfig, k.Refresh, k.SwitchContext, k.Up, k.Down, k.Esc},
 	}
 }
 

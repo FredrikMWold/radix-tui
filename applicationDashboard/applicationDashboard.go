@@ -1,7 +1,10 @@
 package appllicationdashboard
 
 import (
+	"fmt"
+
 	"github.com/FredrikMWold/radix-tui/applicationDashboard/commands"
+	contextswitcher "github.com/FredrikMWold/radix-tui/applicationDashboard/contextSwitcher"
 	"github.com/FredrikMWold/radix-tui/styles"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -34,9 +37,45 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.hasAuthRedirect = false
 		return m, commands.GetApplications
 
+	case contextswitcher.ContextSelected:
+		// Context was selected, save it and reload
+		m.focused = m.previousFocused
+		return m, commands.SetContext(string(msg))
+
+	case contextswitcher.ContextCancelled:
+		// Context switcher was cancelled, restore previous focus
+		m.focused = m.previousFocused
+		return m, nil
+
+	case commands.ContextChanged:
+		// Context changed successfully, reload everything
+		m.context = string(msg)
+		m.applications = []string{}
+		m.application = commands.Application{}
+		m.isLoadingApplication = false
+		m.loadError = ""
+		m.appsLoaded = false
+		m.focused = application
+		m.keys = ApplicationTableKeys
+		// Reinitialize context switcher with new context
+		m.contextSwitcher = contextswitcher.New(m.context)
+		return m, tea.Batch(commands.GetApplications, m.applicationsTable.Init())
+
 	case tea.KeyMsg:
+		// Handle context switch key globally (except when in context switcher)
+		if msg.String() == "ctrl+s" && m.focused != contextSwitch {
+			m.previousFocused = m.focused
+			m.focused = contextSwitch
+			m.contextSwitcher = contextswitcher.New(m.context)
+			return m, nil
+		}
+
 		switch msg.String() {
 		case "ctrl+c", "q":
+			if m.focused == contextSwitch {
+				m.focused = m.previousFocused
+				return m, nil
+			}
 			return m, tea.Quit
 		case "ctrl+r":
 			if m.application.Name != "" {
@@ -54,6 +93,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.keys = BuildDeployFormKeys
 			}
 		case "esc":
+			if m.focused == contextSwitch {
+				m.focused = m.previousFocused
+				return m, nil
+			}
 			if m.focused == pipeline {
 				m.focused = application
 				m.keys = ApplicationTableKeys
@@ -65,9 +108,30 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case commands.Applications:
-		// Loaded apps → clear any implicit auth-waiting state
-		m.applications = msg
-		m.hasAuthRedirect = false
+		// Accept applications if:
+		// 1. Context matches current context, OR
+		// 2. We don't have a context yet (initial load - accept cache immediately)
+		if msg.Context == m.context || m.context == "" {
+			m.applications = msg.Apps
+			m.hasAuthRedirect = false
+			m.loadError = ""
+			m.appsLoaded = true
+			// If we didn't have context yet, set it from the message
+			if m.context == "" {
+				m.context = msg.Context
+			}
+		}
+
+	case commands.ApplicationsError:
+		// Only show error if it's for the current context (or no context set yet)
+		if msg.Context == m.context || m.context == "" {
+			m.hasAuthRedirect = false
+			m.loadError = fmt.Sprintf("Failed to load applications for context '%s':\n%s\n\nPress ctrl+s to switch context or q to quit", msg.Context, msg.Err.Error())
+			m.appsLoaded = true
+			if m.context == "" {
+				m.context = msg.Context
+			}
+		}
 
 	case Context:
 		m.context = string(msg)
@@ -96,6 +160,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	var pageCmd tea.Cmd
+	if m.focused == contextSwitch {
+		m.contextSwitcher, pageCmd = m.contextSwitcher.Update(msg)
+	}
 	if m.focused == buildAndDeploy {
 		m.buildAndDeploy, pageCmd = m.buildAndDeploy.Update(msg)
 	}
@@ -139,7 +206,7 @@ func (m Model) View() string {
 			)
 
 	}
-	if len(m.applications) == 0 {
+	if !m.appsLoaded {
 		if m.hasAuthRedirect {
 			// During redirect, show text without spinner
 			return lipgloss.NewStyle().
@@ -149,6 +216,23 @@ func (m Model) View() string {
 				AlignVertical(lipgloss.Center).
 				Render("Waiting for authentication")
 		}
+		if m.loadError != "" {
+			// Show error message with option to switch context
+			errorStyle := lipgloss.NewStyle().
+				Foreground(lipgloss.Color("196")).
+				Bold(true)
+			content := errorStyle.Render(m.loadError)
+			// If context switcher is open, show it as overlay
+			if m.focused == contextSwitch {
+				return m.renderContextSwitcherOverlay(content)
+			}
+			return lipgloss.NewStyle().
+				Height(m.height).
+				Width(m.width).
+				AlignHorizontal(lipgloss.Center).
+				AlignVertical(lipgloss.Center).
+				Render(content)
+		}
 		// Otherwise, show normal loading with spinner
 		return lipgloss.NewStyle().
 			Height(m.height).
@@ -157,7 +241,24 @@ func (m Model) View() string {
 			AlignVertical(lipgloss.Center).
 			Render("Loading applications " + m.spinner.View())
 	}
-	return lipgloss.JoinHorizontal(
+
+	// Handle empty apps list (loaded successfully but no apps)
+	if len(m.applications) == 0 {
+		content := fmt.Sprintf("No applications found in context '%s'\n\nPress ctrl+s to switch context or q to quit", m.context)
+		// If context switcher is open, show it as overlay
+		if m.focused == contextSwitch {
+			return m.renderContextSwitcherOverlay(content)
+		}
+		return lipgloss.NewStyle().
+			Height(m.height).
+			Width(m.width).
+			AlignHorizontal(lipgloss.Center).
+			AlignVertical(lipgloss.Center).
+			Render(content)
+	}
+
+	// Build the main view
+	mainView := lipgloss.JoinHorizontal(
 		lipgloss.Top,
 		lipgloss.JoinVertical(
 			lipgloss.Top,
@@ -167,4 +268,27 @@ func (m Model) View() string {
 		),
 		m.getActivePageView(),
 	) + "\n" + m.help.View(m.keys)
+
+	// If context switcher is active, show it as a modal overlay
+	if m.focused == contextSwitch {
+		return m.renderContextSwitcherOverlay(mainView)
+	}
+
+	return mainView
+}
+
+func (m Model) renderContextSwitcherOverlay(_ string) string {
+	// Create the modal
+	modal := m.contextSwitcher.View()
+
+	// Create a dimmed background effect by placing the modal on top
+	return lipgloss.Place(
+		m.width,
+		m.height,
+		lipgloss.Center,
+		lipgloss.Center,
+		modal,
+		lipgloss.WithWhitespaceChars(" "),
+		lipgloss.WithWhitespaceForeground(lipgloss.Color("0")),
+	)
 }

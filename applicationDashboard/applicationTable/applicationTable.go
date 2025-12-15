@@ -26,8 +26,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 	case commands.Applications:
 		m.isLoadingApplications = false
-		rows := make([]table.Row, len(msg))
-		for i, app := range msg {
+		rows := make([]table.Row, len(msg.Apps))
+		for i, app := range msg.Apps {
 			rows[i] = table.Row([]string{app})
 		}
 		m.table.SetRows(rows)

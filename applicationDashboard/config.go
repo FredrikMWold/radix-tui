@@ -15,6 +15,10 @@ var ApplicationTableKeys = keyMap{
 		key.WithKeys("down"),
 		key.WithHelp("down", "move down"),
 	),
+	SwitchContext: key.NewBinding(
+		key.WithKeys("ctrl+s"),
+		key.WithHelp("ctrl+s", "switch context"),
+	),
 }
 
 var PipelineTableKeys = keyMap{
@@ -45,6 +49,10 @@ var PipelineTableKeys = keyMap{
 	Esc: key.NewBinding(
 		key.WithKeys("esc"),
 		key.WithHelp("esc", "back"),
+	),
+	SwitchContext: key.NewBinding(
+		key.WithKeys("ctrl+s"),
+		key.WithHelp("ctrl+s", "switch context"),
 	),
 }
 
